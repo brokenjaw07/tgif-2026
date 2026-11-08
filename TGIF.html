@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TGIF 2026</title>
+<!-- 1. Telegram's script. Lets the page talk to Telegram (theme colours, back button, full height). -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  /* Telegram fills these --tg-theme-* variables in. The second value is the fallback for a normal browser. */
+  :root{
+    --bg: var(--tg-theme-bg-color, #fff8ef);
+    --text: var(--tg-theme-text-color, #2a1d14);
+    --hint: var(--tg-theme-hint-color, #8a7666);
+    --card: var(--tg-theme-secondary-bg-color, #f3e7d6);
+    --accent: var(--tg-theme-button-color, #ef6c00);
+    --accent-text: var(--tg-theme-button-text-color, #ffffff);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;padding:16px 16px 40px}
+  h1{font-size:24px;margin:0 0 2px}
+  .sub{color:var(--hint);margin:0 0 14px}
+  h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--hint);margin:22px 0 8px}
+  /* map */
+  .mapwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px;background:var(--card)}
+  svg{width:100%;min-width:760px;height:auto;display:block}
+  .tip{color:var(--hint);font-size:12px;margin:6px 0 0}
+  .zone{cursor:pointer}
+  .zone rect{stroke:rgba(0,0,0,.25);stroke-width:.06}
+  .zone text{font-size:.62px;font-weight:700;fill:#2a1d14;pointer-events:none}
+  .zone:active rect{opacity:.7}
+  /* list */
+  .list{display:grid;gap:8px}
+  .item{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:var(--card);color:var(--text);border:0;border-radius:12px;padding:12px;font:inherit;cursor:pointer}
+  .item .dot{width:12px;height:12px;border-radius:50%;flex:none}
+  .item small{display:block;color:var(--hint)}
+  /* detail sheet */
+  .sheet{position:fixed;inset:auto 0 0 0;max-height:80vh;overflow:auto;background:var(--bg);border-radius:18px 18px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.25);padding:18px 18px calc(24px + env(safe-area-inset-bottom));transform:translateY(105%);visibility:hidden;transition:transform .25s ease,visibility .25s}
+  .sheet.open{transform:none;visibility:visible}
+  .sheet h3{margin:0;font-size:20px}
+  .where{color:var(--hint);margin:4px 0 12px}
+  .sheet ol,.sheet ul{padding-left:20px;margin:6px 0}
+  .btn{display:inline-block;margin-top:12px;background:var(--accent);color:var(--accent-text);border:0;border-radius:10px;padding:10px 14px;font:inherit;font-weight:700;text-decoration:none;cursor:pointer}
+  .close{float:right;background:transparent;border:0;color:var(--hint);font-size:22px;cursor:pointer}
+</style>
+</head>
+<body>
+  <h1>TGIF 2026 🌮🪅</h1>
+  <p class="sub">Fri 13 Nov · 6:30PM · The Hub. Tap a place on the map or a station below.</p>
+
+  <!-- 2. The map. One <g class="zone" data-id="..."> per place. Units are metres (roughly). -->
+  <div class="mapwrap"><svg id="map" viewBox="0 0 42 12.4" role="img" aria-label="Map of the Hub"></svg></div>
+  <p class="tip">Swipe the map sideways to see the whole Hub.</p>
+
+  <h2>All stations</h2>
+  <div class="list" id="list"></div>
+
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true">
+    <button class="close" id="close" aria-label="Close">✕</button>
+    <div id="sheetBody"></div>
+  </div>
+
+<script>
+/* 3. ALL THE CONTENT LIVES HERE. Adel and Kerrine's instructions go into "how".
+      To add a video, paste the link into "video" (YouTube unlisted or Google Drive link). Leave "" for none.
+      x, y, w, h = where the box sits on the map (metres from the top-left corner of the Hub). */
+const STATIONS = [
+  { id:"reg",    name:"Registration",        where:"Loft, right at the entrance", color:"#c82828", x:22.6, y:10.4, w:4.0, h:1.6,
+    how:["Have your PayNow or cash ready", "Pay at counter A or B", "Get your wristband. Keep it on all night"], video:"" },
+  { id:"food",   name:"Food",                where:"Loft, along the curtains",    color:"#ef6c00", x:23.6, y:0.8, w:9.6, h:1.4,
+    how:["DIY tacos / burritos + nachos", "DIY potato spuds", "Churros + chocolate", "Queue goes one way, from the pantry end"], video:"" },
+  { id:"drinks", name:"DIY Mocktails",       where:"Loft, big wooden table by the pantry", color:"#f6a529", x:21.6, y:0.9, w:1.6, h:3.0,
+    how:["Pick your juices + Sprite, mix your own", "Print your face and stick it on your straw", "Canned drinks are in the fridge"], video:"" },
+  { id:"yard",   name:"Yard seating",        where:"Loft, middle",                color:"#b5523b", x:25.2, y:4.0, w:5.4, h:5.6,
+    how:["Grab your food and sit on the carpets", "Board games are on the shelf. Bring them to the tables"], video:"" },
+  { id:"brace",  name:"Friendship bracelets", where:"Loft, black oval table",     color:"#2e7d32", x:34.8, y:1.4, w:2.4, h:2.2,
+    how:["TODO: Adel / Kerrine write the braiding steps here"], video:"" },
+  { id:"jagua",  name:"Jagua tattoo",        where:"Loft, grey table next to the bracelets", color:"#235c7f", x:38.0, y:1.4, w:2.0, h:2.2,
+    how:["$1.50 small / $3 big", "It takes a few hours to darken and lasts about 1 to 2 weeks", "Let it dry before you touch anything"], video:"" },
+  { id:"stage",  name:"Limbo + pin the donkey", where:"Loft, in front of the screen", color:"#7b3fa0", x:36.8, y:4.4, w:5.0, h:4.0,
+    how:["Limbo competition: lowest on the leaderboard wins", "Pin the donkey: blindfold on, 3 spins, go"], video:"" },
+  { id:"lounge", name:"Chill lounge",        where:"Loft, corner past the Mac desk", color:"#c9b28a", x:36.4, y:9.0, w:5.4, h:3.2,
+    how:["Puffy sofas, conversation cards, just chill"], video:"" },
+  { id:"granny", name:"Mexican Granny", short:"Granny",      where:"Haven",                       color:"#43a047", x:0.2, y:0.2, w:6.6, h:12.0,
+    how:["Granny wears a sombrero", "Snatch the sombrero without getting tagged", "Tagged? You're out for the round"], video:"" },
+  { id:"game",   name:"Gaming room",         where:"Haus 2",                      color:"#1e88e5", x:7.2, y:6.3, w:7.0, h:5.9,
+    how:["PS5 + Switch", "Take turns so everyone gets a go"], video:"" },
+  { id:"ktv",    name:"KTV room",            where:"Haus 1",                      color:"#8e24aa", x:14.6, y:6.3, w:7.6, h:5.9,
+    how:["Pick songs on the TV", "Pass the mic around"], video:"" },
+  { id:"pb2",    name:"Photobooth (funny)",  where:"Meeting Room 2",              color:"#e91e63", x:9.2, y:0.2, w:4.9, h:3.2,
+    how:["Grab props, pose, take a photo"], video:"" },
+  { id:"pb1",    name:"Photobooth (Mexican)", where:"Meeting Room 1",             color:"#ff7043", x:14.5, y:0.2, w:5.5, h:3.2,
+    how:["Colourful Mexican backdrop. Grab your friends"], video:"" },
+];
+
+/* 4. Draw the map from the list above. Grey boxes are just walls/rooms for context. */
+const svg = document.getElementById("map"), NS = "http://www.w3.org/2000/svg";
+const ROOMS = [[0,0,7,12.4],[7,0,2,3.6],[9,0,5.3,3.6],[14.3,0,5.9,3.6],[7,6.1,7.4,6.3],[14.4,6.1,8,6.3],[20.2,0.8,21.8,11.6]];
+ROOMS.forEach(([x,y,w,h]) => { const r = document.createElementNS(NS,"rect"); Object.entries({x,y,width:w,height:h,fill:"none",stroke:"currentColor","stroke-opacity":.35,"stroke-width":.08}).forEach(([k,v]) => r.setAttribute(k,v)); svg.appendChild(r); });
+STATIONS.forEach(s => {
+  const g = document.createElementNS(NS,"g"); g.setAttribute("class","zone"); g.setAttribute("tabindex","0");
+  const r = document.createElementNS(NS,"rect"); Object.entries({x:s.x,y:s.y,width:s.w,height:s.h,rx:.3,fill:s.color,"fill-opacity":.8}).forEach(([k,v]) => r.setAttribute(k,v));
+  const t = document.createElementNS(NS,"text"); t.setAttribute("x", s.x + s.w/2); t.setAttribute("y", s.y + s.h/2 + .2); t.setAttribute("text-anchor","middle"); t.textContent = s.short || s.name.split(" ")[0];
+  g.append(r, t); g.addEventListener("click", () => openSheet(s)); g.addEventListener("keydown", e => { if (e.key === "Enter") openSheet(s); }); svg.appendChild(g);
+});
+
+// start the map scrolled to the Loft, where most of the stations are
+const wrap = document.querySelector(".mapwrap"); requestAnimationFrame(() => { wrap.scrollLeft = wrap.scrollWidth * 0.46; });
+
+/* 5. The list under the map. */
+const list = document.getElementById("list");
+STATIONS.forEach(s => { const b = document.createElement("button"); b.className = "item";
+  b.innerHTML = `<span class="dot" style="background:${s.color}"></span><span><b></b><small></small></span>`;
+  b.querySelector("b").textContent = s.name; b.querySelector("small").textContent = s.where;
+  b.addEventListener("click", () => openSheet(s)); list.appendChild(b); });
+
+/* 6. The pop-up sheet with instructions + video button. */
+const sheet = document.getElementById("sheet"), body = document.getElementById("sheetBody");
+const tg = window.Telegram && window.Telegram.WebApp;
+function openSheet(s){
+  body.innerHTML = `<h3></h3><div class="where"></div><ul></ul>`;
+  body.querySelector("h3").textContent = s.name; body.querySelector(".where").textContent = "📍 " + s.where;
+  const ul = body.querySelector("ul"); s.how.forEach(line => { const li = document.createElement("li"); li.textContent = line; ul.appendChild(li); });
+  if (s.video){ const a = document.createElement("button"); a.className = "btn"; a.textContent = "▶ Watch how";
+    a.addEventListener("click", () => tg && tg.openLink ? tg.openLink(s.video) : window.open(s.video, "_blank")); body.appendChild(a); }
+  sheet.classList.add("open");
+  if (tg && tg.BackButton){ tg.BackButton.show(); }       // Telegram's own back arrow closes the sheet
+  if (tg && tg.HapticFeedback){ tg.HapticFeedback.impactOccurred("light"); }
+}
+function closeSheet(){ sheet.classList.remove("open"); if (tg && tg.BackButton) tg.BackButton.hide(); }
+document.getElementById("close").addEventListener("click", closeSheet);
+
+/* 7. Tell Telegram the page is ready and open it full height. Safe to skip in a normal browser. */
+if (tg){ tg.ready(); tg.expand(); if (tg.BackButton) tg.BackButton.onClick(closeSheet); }
+</script>
+</body>
+</html>
