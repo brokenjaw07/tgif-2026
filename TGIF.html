@@ -20,6 +20,8 @@
   body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;padding:16px 16px 40px}
   h1{font-size:24px;margin:0 0 2px}
   .sub{color:var(--hint);margin:0 0 14px}
+  .tonight{display:grid;gap:4px;background:var(--card);border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:14px}
+  .tonight b{display:inline-block;width:46px}
   h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--hint);margin:22px 0 8px}
   /* map */
   .mapwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px;background:var(--card)}
@@ -48,6 +50,13 @@
   <h1>TGIF 2026 🌮🪅</h1>
   <p class="sub">Fri 13 Nov · 6:30PM · The Hub. Tap a place on the map or a station below.</p>
 
+  <div class="tonight">
+    <div><b>6:30</b> Doors open. Register at the entrance</div>
+    <div><b>8:00</b> Piñatas in Haven 🪅</div>
+    <div><b>8:20</b> Giant cake in the Loft 🎂</div>
+    <div><b>After</b> Free and easy. Sing, play, chill</div>
+  </div>
+
   <!-- 2. The map. One <g class="zone" data-id="..."> per place. Units are metres (roughly). -->
   <div class="mapwrap"><svg id="map" viewBox="0 0 42 12.4" role="img" aria-label="Map of the Hub"></svg></div>
   <p class="tip">Swipe the map sideways to see the whole Hub.</p>
@@ -61,36 +70,70 @@
   </div>
 
 <script>
-/* 3. ALL THE CONTENT LIVES HERE. Adel and Kerrine's instructions go into "how".
-      To add a video, paste the link into "video" (YouTube unlisted or Google Drive link). Leave "" for none.
+/* 3. ALL THE CONTENT LIVES HERE. Edit the text inside the quotes.
+      how   = the steps people see (one line each)
+      links = buttons at the bottom: { t:"button text", u:"https://..." }. Paste YouTube / Google Drive video links here too.
       x, y, w, h = where the box sits on the map (metres from the top-left corner of the Hub). */
 const STATIONS = [
-  { id:"reg",    name:"Registration",        where:"Loft, right at the entrance", color:"#c82828", x:22.6, y:10.4, w:4.0, h:1.6,
-    how:["Have your PayNow or cash ready", "Pay at counter A or B", "Get your wristband. Keep it on all night"], video:"" },
-  { id:"food",   name:"Food",                where:"Loft, along the curtains",    color:"#ef6c00", x:23.6, y:0.8, w:9.6, h:1.4,
-    how:["DIY tacos / burritos + nachos", "DIY potato spuds", "Churros + chocolate", "Queue goes one way, from the pantry end"], video:"" },
-  { id:"drinks", name:"DIY Mocktails",       where:"Loft, big wooden table by the pantry", color:"#f6a529", x:21.6, y:0.9, w:1.6, h:3.0,
-    how:["Pick your juices + Sprite, mix your own", "Print your face and stick it on your straw", "Canned drinks are in the fridge"], video:"" },
-  { id:"yard",   name:"Yard seating",        where:"Loft, middle",                color:"#b5523b", x:25.2, y:4.0, w:5.4, h:5.6,
-    how:["Grab your food and sit on the carpets", "Board games are on the shelf. Bring them to the tables"], video:"" },
-  { id:"brace",  name:"Friendship bracelets", where:"Loft, black oval table",     color:"#2e7d32", x:34.8, y:1.4, w:2.4, h:2.2,
-    how:["TODO: Adel / Kerrine write the braiding steps here"], video:"" },
-  { id:"jagua",  name:"Jagua tattoo",        where:"Loft, grey table next to the bracelets", color:"#235c7f", x:38.0, y:1.4, w:2.0, h:2.2,
-    how:["$1.50 small / $3 big", "It takes a few hours to darken and lasts about 1 to 2 weeks", "Let it dry before you touch anything"], video:"" },
-  { id:"stage",  name:"Limbo + pin the donkey", where:"Loft, in front of the screen", color:"#7b3fa0", x:36.8, y:4.4, w:5.0, h:4.0,
-    how:["Limbo competition: lowest on the leaderboard wins", "Pin the donkey: blindfold on, 3 spins, go"], video:"" },
-  { id:"lounge", name:"Chill lounge",        where:"Loft, corner past the Mac desk", color:"#c9b28a", x:36.4, y:9.0, w:5.4, h:3.2,
-    how:["Puffy sofas, conversation cards, just chill"], video:"" },
-  { id:"granny", name:"Mexican Granny", short:"Granny",      where:"Haven",                       color:"#43a047", x:0.2, y:0.2, w:6.6, h:12.0,
-    how:["Granny wears a sombrero", "Snatch the sombrero without getting tagged", "Tagged? You're out for the round"], video:"" },
-  { id:"game",   name:"Gaming room",         where:"Haus 2",                      color:"#1e88e5", x:7.2, y:6.3, w:7.0, h:5.9,
-    how:["PS5 + Switch", "Take turns so everyone gets a go"], video:"" },
-  { id:"ktv",    name:"KTV room",            where:"Haus 1",                      color:"#8e24aa", x:14.6, y:6.3, w:7.6, h:5.9,
-    how:["Pick songs on the TV", "Pass the mic around"], video:"" },
-  { id:"pb2",    name:"Photobooth (funny)",  where:"Meeting Room 2",              color:"#e91e63", x:9.2, y:0.2, w:4.9, h:3.2,
-    how:["Grab props, pose, take a photo"], video:"" },
-  { id:"pb1",    name:"Photobooth (Mexican)", where:"Meeting Room 1",             color:"#ff7043", x:14.5, y:0.2, w:5.5, h:3.2,
-    how:["Colourful Mexican backdrop. Grab your friends"], video:"" },
+  { id:"reg", name:"Registration", short:"Register", where:"Loft, right at the entrance", color:"#c82828", x:22.8, y:10.5, w:4.8, h:1.6,
+    how:["Have your PayNow or cash ready while you queue",
+         "Go to counter A or B (reception helps if it gets busy)",
+         "Paid online already? Just tell them your name",
+         "Crew puts your wristband on. Keep it on all night, it's your entry pass"], links:[] },
+  { id:"food", name:"Food", where:"Loft, along the curtains", color:"#ef6c00", x:23.6, y:0.8, w:9.6, h:1.4,
+    how:["Queue starts at the pantry end and goes one way",
+         "1. DIY tacos / burritos + nachos: wrap, then add mince, cheese, salsa, sour cream",
+         "2. DIY potato spuds: cut it open, add butter, cheese, bacon bits, sour cream",
+         "3. More food + churros with melted chocolate at the end",
+         "Grab what you want and sit at the yard tables"], links:[] },
+  { id:"drinks", name:"DIY Mocktails", short:"Drinks", where:"Loft, big wooden table by the pantry", color:"#f6a529", x:21.6, y:0.9, w:1.6, h:3.0,
+    how:["Grab a cup",
+         "Mix your own: Sprite, orange juice, pineapple juice, Ribena, mint leaves",
+         "Ask crew to print your face and stick it on your straw 😎",
+         "Canned drinks are in the fridge"], links:[] },
+  { id:"yard", name:"Yard seating", short:"Seating", where:"Loft, middle", color:"#b5523b", x:25.2, y:4.0, w:5.4, h:5.6,
+    how:["Low tables, sit on the carpets",
+         "After eating: grab a board game or conversation cards from the shelf and play here",
+         "Board games: Avalon, Uno, Assets and more"], links:[] },
+  { id:"brace", name:"Friendship bracelets", short:"Bracelets", where:"Loft, black oval table", color:"#2e7d32", x:34.8, y:1.4, w:2.4, h:2.2,
+    how:["Pick 3 colours of yarn and cut each about 40cm long",
+         "Tie all 3 together in a knot, leaving a short tail. Tape the knot to the table",
+         "Braid: cross the left strand over the middle, then the right strand over the middle. Repeat",
+         "Keep it tight and even until it fits around your wrist",
+         "Tie a knot at the end, then tie the two ends together on your wrist",
+         "Make 2 and give one to someone you met tonight 🫶"],
+    links:[{ t:"Step-by-step with photos", u:"https://www.instructables.com/id/-DIY-Braided-Bracelet-quick-easy-how-to-tutorial/" },
+           { t:"More easy bracelet styles", u:"https://www.lovecrafts.com/blogs/articles/how-to-make-friendship-bracelets" }] },
+  { id:"jagua", name:"Jagua tattoo", short:"Jagua", where:"Loft, grey table next to the bracelets", color:"#235c7f", x:38.0, y:1.4, w:2.0, h:2.2,
+    how:["$1.50 small / $3 big. Pick a design, crew draws it on",
+         "Let the gel dry completely and don't touch it",
+         "Leave the gel on for about 2.5 to 4 hours, then rinse with lukewarm water, no soap",
+         "It looks light at first and turns dark blue over 24 to 36 hours",
+         "Avoid long showers, swimming and lotion for the first day or two",
+         "Lasts about 1 to 2 weeks. It does NOT wash off, so choose your spot wisely (school?)"],
+    links:[{ t:"Jagua aftercare guide", u:"https://www.temporalis.tattoo/blogs/tips-tricks/jagua-tattoo-aftercare" }] },
+  { id:"stage", name:"Limbo + pin the donkey", short:"Limbo", where:"Loft, in front of the screen", color:"#7b3fa0", x:36.8, y:4.4, w:5.0, h:4.0,
+    how:["Limbo: bend backwards and get under the stick without touching it or the floor with your hands",
+         "Every round the stick goes lower. Lowest successful height goes on the leaderboard",
+         "Pin the donkey: blindfold on, crew spins you 3 times, stick the tail on the donkey",
+         "Closest tail wins bragging rights"], links:[] },
+  { id:"lounge", name:"Chill lounge", short:"Chill", where:"Loft, corner past the Mac desk", color:"#c9b28a", x:36.4, y:9.0, w:5.4, h:3.2,
+    how:["Puffy sofas, conversation cards (No Filter / WNRS)", "For when you just want to sit and talk"], links:[] },
+  { id:"granny", name:"Mexican Granny", short:"Granny", where:"Haven", color:"#43a047", x:0.2, y:0.2, w:6.6, h:12.0,
+    how:["Granny sits in the middle wearing a sombrero",
+         "Everyone tries to snatch the sombrero",
+         "If Granny tags you, you're out for that round",
+         "Whoever gets the sombrero becomes the next Granny",
+         "Proper shoes or socks only, no slippers. The game master's call is final",
+         "8PM: everyone comes here for the piñatas"], links:[] },
+  { id:"game", name:"Gaming room", short:"Gaming", where:"Haus 2", color:"#1e88e5", x:7.2, y:6.3, w:7.0, h:5.9,
+    how:["PS5 on the wall TV, Switch on the trolley TV", "Write your name on the sign-up sheet by the door", "About 15 minutes per turn so everyone gets a go"], links:[] },
+  { id:"ktv", name:"KTV room", short:"KTV", where:"Haus 1", color:"#8e24aa", x:14.6, y:6.3, w:7.6, h:5.9,
+    how:["Search the song on YouTube on the TV (add 'karaoke' to the search)", "Pass the mic around, everyone sings", "Wait for the song to end before switching"], links:[] },
+  { id:"pb2", name:"Photobooth (funny)", short:"Photobooth", where:"Meeting Room 2", color:"#e91e63", x:9.2, y:0.2, w:4.9, h:3.2,
+    how:["Grab props: sombreros, funny shades", "Pose in front of the backdrop", "Phone on the tripod with the ring light, use the timer"], links:[] },
+  { id:"pb1", name:"Photobooth (Mexican)", short:"Photobooth", where:"Meeting Room 1", color:"#ff7043", x:14.5, y:0.2, w:5.5, h:3.2,
+    how:["Colourful Mexican paper backdrop", "Grab your friends, phone on the tripod, use the timer", "Ask crew about photo strips"], links:[] },
 ];
 
 /* 4. Draw the map from the list above. Grey boxes are just walls/rooms for context. */
@@ -121,8 +164,8 @@ function openSheet(s){
   body.innerHTML = `<h3></h3><div class="where"></div><ul></ul>`;
   body.querySelector("h3").textContent = s.name; body.querySelector(".where").textContent = "📍 " + s.where;
   const ul = body.querySelector("ul"); s.how.forEach(line => { const li = document.createElement("li"); li.textContent = line; ul.appendChild(li); });
-  if (s.video){ const a = document.createElement("button"); a.className = "btn"; a.textContent = "▶ Watch how";
-    a.addEventListener("click", () => tg && tg.openLink ? tg.openLink(s.video) : window.open(s.video, "_blank")); body.appendChild(a); }
+  (s.links || []).forEach(l => { const a = document.createElement("button"); a.className = "btn"; a.textContent = "🔗 " + l.t;
+    a.addEventListener("click", () => tg && tg.openLink ? tg.openLink(l.u) : window.open(l.u, "_blank")); body.appendChild(a); body.appendChild(document.createTextNode(" ")); });
   sheet.classList.add("open");
   if (tg && tg.BackButton){ tg.BackButton.show(); }       // Telegram's own back arrow closes the sheet
   if (tg && tg.HapticFeedback){ tg.HapticFeedback.impactOccurred("light"); }
