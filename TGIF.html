@@ -210,7 +210,7 @@ const STATIONS = [
   { id:"pb", em:"📸", name:"Photobooths", where:"Meeting Room 1 + Meeting Room 2", c:"#ff3d7f",
     how:["2 photobooths, one in each meeting room", "Grab some props and your friends", "Phone on the tripod with the ring light, use the timer", "Ask crew about photo strips"], links:[] },
 ];
-const BOOKING_API = ""; // paste your Google Apps Script Web app URL here (ends in /exec). Leave "" to hide booking.
+const BOOKING_API = "https://script.google.com/macros/s/AKfycbwBbWddES-1CVIeQDLR1ef2Wz9coWz75k7Hw8tBkvo17SsHq42tgN8qlX7rwxEVuIg/exec"; // paste your Google Apps Script Web app URL here (ends in /exec). Leave "" to hide booking.
 const BOOKABLE = { ktv:"KTV", granny:"Granny" }; // station id : room name in the Slots tab
 const FLOORPLAN_URL = "https://brokenjaw07.github.io/tgif-2026/TGIF_Hub_FloorPlan.html";
 const PINS = {"bdz": [[76.7, 40.0]], "reg": [[59, 52.8]], "food": [[63.7, 14.4]], "drinks": [[52.6, 17.5]], "brace": [[77.4, 17.8]], "jagua": [[82.9, 17.8]], "stage": [[85, 32.5]], "granny": [[15.6, 32.5]], "game": [[28.6, 44.4]], "ktv": [[44.6, 44.4]], "chill": [[63.6, 42.9], [87.6, 50.8]], "pb": [[33.1, 15.4], [43.2, 15.4]]}; // where each station's pin sits on the map picture, [% from left, % from top]
