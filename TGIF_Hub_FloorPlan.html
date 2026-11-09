@@ -23,7 +23,10 @@ body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:14px
 .lbl{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;pointer-events:none;line-height:1.15;text-align:center}
 .lbl.room{font-family:var(--display);font-size:13px;color:#2a1d14;text-shadow:0 0 4px #fff,0 0 8px #fff}
 .lbl.room small{display:block;font-family:var(--body);font-weight:700;font-size:11px;margin-top:2px;padding:2px 7px;border-radius:999px;color:#fff;text-shadow:none}
-.lbl.item{font-size:10.5px;font-weight:600;color:#2a1d14;background:#fffaf2;border:1px solid #e6d8c4;padding:1px 6px;border-radius:4px;opacity:.95}
+.lbl.item{font-size:11px;font-weight:700;color:#2a1d14;background:#fffaf2;border:1px solid #e6d8c4;padding:2px 7px;border-radius:999px;opacity:.95;pointer-events:auto;cursor:pointer;box-shadow:0 1px 3px rgba(40,20,0,.15)}
+.lbl.item.more::after{content:" ⓘ";opacity:.55}
+.lbl.item.open{white-space:normal;width:max-content;max-width:220px;text-align:left;font-weight:600;font-size:12px;border-radius:8px;padding:6px 9px;z-index:5;opacity:1;box-shadow:0 4px 14px rgba(40,20,0,.25)}
+.lbl.item.open::after{content:""}
 .lbl.warn{background:var(--red);color:#fff;border-color:transparent}
 .lbl.dim{opacity:.3}
 .top{position:absolute;left:max(10px,env(safe-area-inset-left,0px));top:10px;right:10px;display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start;pointer-events:none}
@@ -432,7 +435,7 @@ const INV = [ ["chapel","Foldable chapel tables",20], ["crate","Crates",40], ["r
 const ROOMS = [
   { id:"loft", name:"Loft", act:"Main party space", color:"#ef6c00", floor:"tile", tint:"#c6c1b9", rects:[[20.2,0.8,21.8,5.3],[22.4,6.1,19.6,6.3]], lbl:[31.0,3.95],
    has:["Pantry counter, fridge, water dispenser","Big wooden table with 3 pendant lamps, parallel to the pantry (can't move)","Black oval table with black chairs","2 puffy cream sofas on a rug, 2 cowhide cubes","Grey sofa, cream sofa, beanbag, plants, cube shelves","Curtains along the long wall","Mac desk + sound desk on the bottom wall (CANNOT MOVE)","~5 white round tables (not needed now that seating is yard style)"],
-   setup:["Door → 2 round registration counters on the left (PayNow QR, cash box, wristbands), reception desk on the right → food line or drinks","Drinks: DIY mocktails + face-straw printer on the big wooden table by the fridge","Food: 4 chapel tables along the curtains, one way from the pantry end, with colourful cloths, fairy lights and flowers","Yard seating: 2 rows of 3 chapel tables on crates in the middle, everyone sits on the carpets (no cushions)","Craft corner at the far end: friendship bracelets on the oval table, jagua next to it under a lamp, bedazzling on a long table just past the yard seating","Board games live on the cube shelf. People play them at the yard tables after eating","Stage in front of the screen: limbo + pin the donkey before 8PM, the giant cake at 8:20, then open floor for organic activities","Chill lounge: puffy sofas in the corner past the Mac desk"],
+   setup:["Door → 2 round registration counters on the left (PayNow QR, cash box, wristbands), reception desk on the right → food line or drinks","Drinks: DIY mocktails + face-straw printer on the big wooden table by the fridge","Food: 4 chapel tables along the curtains, one way from the pantry end, with colourful cloths, fairy lights and flowers","Main chill area: 2 rows of 3 chapel tables on crates in the middle, everyone sits on the carpets (no cushions)","Craft corner at the far end: friendship bracelets on the oval table, jagua next to it under a lamp, bedazzling on a long table just past the yard seating","Board games live on the cube shelf. People play them in the main chill area after eating","Stage in front of the screen: limbo + pin the donkey before 8PM, the giant cake at 8:20, then open floor for organic activities","Chill area: puffy sofas in the corner past the Mac desk"],
    watch:["The Mac desk area (red stripes) is off limits","The entrance is tight. The queue forms OUTSIDE the door in 2 lines, one per counter","Use the Mac desk speaker + sound desk for the emcee and Loft KTV (confirmed). Get someone who knows how to run it","Smoke detectors on the ceiling. Lots of lit candles at 8PM can set off the alarm. Check with the Hub IC or use LED candles","Yard tables don't need to move at 8PM. The piñata is in Haven and the cake is on the Loft stage"] },
  { id:"haus1", name:"Haus 1", act:"KTV Room", color:"#7b3fa0", floor:"concrete", tint:"#6d5a4a", rects:[[14.4,6.1,8.0,6.3]], lbl:[18.4,8.4],
    has:["Wooden sofa with cushions","2 armchairs + 1 white chair","Coffee table","TV on the wall","Shelves and paper lanterns"],
@@ -442,13 +445,13 @@ const ROOMS = [
    has:["Grey sofa, rug, coffee table","2 red chairs, wooden lounge chair","TV on the wall","Stack of wooden benches"],
    setup:["PS5 on the wall TV with the sofa facing it","Switch on a TV trolley from Haven, so 2 games run at once","Sign-up sheet + 15 min turns on the door"],
    watch:["Count controllers per console before the day","Extension cord for the trolley TV + Switch dock"] },
- { id:"mr1", name:"Meeting Rm 1", act:"Photobooth A", color:"#c2185b", floor:"tile", tint:"#bfb9b0", rects:[[14.3,0,5.9,3.6]], lbl:[17.25,2.2],
+ { id:"mr1", name:"Meeting Rm 1", act:"Photobooth", color:"#c2185b", floor:"tile", tint:"#bfb9b0", rects:[[14.3,0,5.9,3.6]], lbl:[17.25,2.2],
    has:["Meeting table + chairs"], setup:["Push the table to one side as the props table","TGIF'26 newspaper backdrop on the far wall","Ring light + phone tripod"], watch:["~6 people max inside at once","Decide if photo strips get printed, and who runs it"] },
- { id:"mr2", name:"Meeting Rm 2", act:"Photobooth B", color:"#c2185b", floor:"tile", tint:"#bfb9b0", rects:[[9,0,5.3,3.6]], lbl:[11.65,2.2],
+ { id:"mr2", name:"Meeting Rm 2", act:"Photobooth", color:"#c2185b", floor:"tile", tint:"#bfb9b0", rects:[[9,0,5.3,3.6]], lbl:[11.65,2.2],
    has:["Meeting table + chairs"], setup:["Funny booth: sombreros, TGIF 2026 shades, cactus cut-out","Confetti corner"], watch:["Confetti means cleanup. Bring a broom"] },
  { id:"store", name:"Store", act:"Logistics", color:"#c82828", floor:"tile", tint:"#bdb6ab", rects:[[7,0,2,3.6]], lbl:[8,1.8],
    has:["Storage"], setup:["Spare cups, ice, piñata candy, cake, candles, prizes"], watch:["Crew only. Keep the door shut"] },
- { id:"haven", name:"Haven", act:"Mexican Granny (one big room)", color:"#2e7d32", floor:"planks", tint:"#4a4744", rects:[[0,0,7,12.4]], lbl:[3.5,6.2],
+ { id:"haven", name:"Haven", act:"Mexican Granny", color:"#2e7d32", floor:"planks", tint:"#4a4744", rects:[[0,0,7,12.4]], lbl:[3.5,6.2],
    has:["Pull-out wall stays open, so it's one big room","Projector + screen + 2 wall speakers","Leather sofa, grey sofa","~45 black metal chairs","Main door from the corridor + 2 side doors at the back"],
    setup:["One big Granny zone in the middle so more people play at once","Granny wears a sombrero. Players try to snatch it, Granny tries to tag them","Stack the chairs and push the sofas against the walls","2 pool noodles (padded), a sombrero, a chair for the Granny"],
    watch:["No slippers. Proper shoes or socks only","Have one crew member as game master to reset rounds","Before the event: Haven (and Haus 2) can be the staging area to prep stuff, then bring it out","8PM piñata happens here: stop the Granny game at 7:55, clear the floor, then it's piñata on a pole with 2 holders and a 2m safety circle","No TVs or trolleys in here (people will be running). The trolley TV goes to Haus 2"] },
@@ -465,7 +468,7 @@ const STATIC = [ // in every time slot
   { id:"mac", t:"macDesk", x:32.1, z:11.85, r:Math.PI },
   { id:"cubeL", t:"cube", x:34.0, z:1.3, r:0, label:"Board games shelf" },
   { id:"greyL", t:"greySofa", x:41.5, z:2.4, r:-Math.PI/2 }, { id:"plantL", t:"plant", x:41.6, z:3.95, r:0 },
-  { id:"rugL", t:"rug", x:38.6, z:10.6, r:0, label:"Chill lounge" },
+  { id:"rugL", t:"rug", x:38.6, z:10.6, r:0, label:"Chill area: puffy sofas + conversation cards" },
   { id:"puffy1", t:"puffy", x:38.6, z:9.45, r:0 }, { id:"puffy2", t:"puffy", x:38.6, z:11.75, r:Math.PI },
   { id:"cow1", t:"cowhide", x:36.35, z:10.6, r:0 }, { id:"cow2", t:"cowhide", x:40.85, z:10.6, r:0 },
   { id:"creamL", t:"creamSofa", x:41.5, z:10.6, r:-Math.PI/2 }, { id:"bbL", t:"beanbag", x:36.4, z:8.8, r:0 },
@@ -503,7 +506,7 @@ const SLOTS = {
     { id:"oval", t:"oval6", x:36.0, z:2.5, r:0, label:"Friendship bracelets (braiding)" },
     { id:"jag", t:"jagua", x:39.0, z:2.5, r:0, label:"Jagua tattoo ($1.50 / $3)" },
     { id:"hvG", t:"grannyBig", x:3.5, z:6.4, r:0, label:"Mexican Granny: snatch the sombrero" },
-    { id:"lblYard", t:"label", x:27.9, z:6.75, label:"Yard seating: low tables on crates, sit on carpets (~36)" },
+    { id:"lblYard", t:"label", x:27.9, z:6.75, label:"Main chill area: low tables on crates, sit on the carpets (~36 people)" },
     { id:"lim", t:"limbo", x:38.8, z:6.4, r:Math.PI/2, label:"Limbo competition" },
     { id:"bdz", t:"bedazzle", x:34.6, z:6.4, r:Math.PI/2, label:"Bedazzling" },
     { id:"don", t:"donkey", x:41.95, z:9.0, r:-Math.PI/2, label:"Pin the donkey" },
@@ -534,7 +537,7 @@ const SLOTS = {
     { id:"oval", t:"oval6", x:36.0, z:2.5, r:0, label:"Friendship bracelets (braiding)" },
     { id:"jag", t:"jagua", x:39.0, z:2.5, r:0, label:"Jagua tattoo ($1.50 / $3)" },
     { id:"hvG", t:"grannyBig", x:3.5, z:6.4, r:0, label:"Mexican Granny: snatch the sombrero" },
-    { id:"lblYard9", t:"label", x:27.9, z:6.75, label:"Chill, board games, conversation cards" },
+    { id:"lblYard9", t:"label", x:27.9, z:6.75, label:"Main chill area: board games + conversation cards" },
     { id:"bdz", t:"bedazzle", x:34.6, z:6.4, r:Math.PI/2, label:"Bedazzling" },
     { id:"lbl9", t:"label", x:38.8, z:6.4, label:"Open floor: organic activities. Follow the flow of people" },
     { id:"mic9", t:"mic", x:36.8, z:8.4, r:0 },
@@ -654,11 +657,23 @@ NOGO.forEach(n => { const g = noGo(n.w, n.d); g.position.set(n.x + n.w/2, 0, n.z
 /* ================= labels ================= */
 const labelsEl = document.getElementById("labels"); const LBL = [];
 function mkLabel(html, cls){ const el = document.createElement("div"); el.className = "lbl " + cls; el.innerHTML = html; labelsEl.appendChild(el); return el; }
+// short name on the plan, tap it to see the full note
+const SHORT = { f1:"Tacos + nachos", f2:"Spuds", f3:"Pasta + finger food", f4:"Churros", communal:"DIY mocktails", regA:"Registration", regB:"Registration", rec:"Reception",
+  oval:"Bracelets", jag:"Jagua tattoo", bdz:"Bedazzling", lim:"Limbo", don:"Pin the donkey", lblYard:"Main chill area", lblYard8:"Main chill area", lblYard9:"Main chill area",
+  rugL:"Chill area", cubeL:"Board games", binP:"Bin", h1tv:"TV", h2tv:"PS5", h2tv2:"Switch", h1spk:"Speaker", mr1bd:"Photobooth", mr2bd:"Photobooth", mr2tb:"Props",
+  hvG:"Mexican Granny", hvStack3:"Spare chairs", pin:"Cactus piñata", pin2:"Unicorn piñata", lblHv8:"Stand outside the circles", cake:"Giant cake", crowd:"Cake crowd", mic8:"Emcee", lbl9:"Open floor" };
+function shortOf(id, text){ if (SHORT[id]) return SHORT[id]; let s = text.split(/[:(]/)[0].trim(); return s.length > 24 ? s.slice(0,22).trim() + "…" : s; }
+function mkTag(short, full, cls){ const el = mkLabel("", cls); el.textContent = short; el.dataset.short = short;
+  if (full && full !== short){ el.classList.add("more"); el.dataset.full = full; }
+  el.addEventListener("click", e => { e.stopPropagation(); if (!el.dataset.full) return; const open = !el.classList.contains("open");
+    document.querySelectorAll(".lbl.item.open").forEach(o => { o.classList.remove("open"); o.textContent = o.dataset.short; });
+    if (open){ el.classList.add("open"); el.textContent = el.dataset.full; } });
+  return el; }
 ROOMS.forEach(r => { LBL.push({ el:mkLabel(`${r.name}<small style="background:${r.color}">${r.act}</small>`, "room"), p:new THREE.Vector3(r.lbl[0],2.4,r.lbl[1]), kind:"room", room:r.id }); });
-doorLbls.forEach(([x,z,t,exit]) => LBL.push({ el:mkLabel(t, "item"), p:new THREE.Vector3(x,0.6,z), kind:"item" }));
-LBL.push({ el:mkLabel("Mac desk area: DO NOT USE", "item warn"), p:new THREE.Vector3(32.1,1.0,10.6), kind:"item" });
-LBL.push({ el:mkLabel("Projector screen (stage)", "item"), p:new THREE.Vector3(41.7,2.6,6.4), kind:"item" });
-LBL.push({ el:mkLabel("fairy lights + flowers on the food tables", "item"), p:new THREE.Vector3(30.3,2.5,1.0), kind:"item" });
+doorLbls.forEach(([x,z,t,exit]) => LBL.push({ el:mkTag(t, t, "item"), p:new THREE.Vector3(x,0.6,z), kind:"item" }));
+LBL.push({ el:mkTag("Mac desk (no-go)", "Mac desk + sound desk. Can't be moved, keep this area clear. Its speaker + mic are used for the emcee and KTV.", "item warn"), p:new THREE.Vector3(32.1,1.0,10.6), kind:"item" });
+LBL.push({ el:mkTag("Screen", "Projector screen. The stage area in front of it is for limbo, the cake at 8:20 and KTV after.", "item"), p:new THREE.Vector3(41.7,2.6,6.4), kind:"item" });
+LBL.push({ el:mkTag("Fairy lights", "Fairy lights above the food line, plus colourful tablecloths and flowers on the food tables", "item"), p:new THREE.Vector3(30.3,2.5,1.0), kind:"item" });
 
 /* ================= convo + flow layers ================= */
 const convoLayer = new THREE.Group(); scene.add(convoLayer);
@@ -667,7 +682,7 @@ function arrowPath(pts, c){ const mt = new THREE.MeshBasicMaterial({ color:c });
   const dir = b.clone().sub(a), len = dir.length(); dir.normalize(); const s = new THREE.Mesh(new THREE.BoxGeometry(len,0.03,0.14), mt); s.position.copy(a.clone().add(b).multiplyScalar(0.5)); s.rotation.y = -Math.atan2(dir.z,dir.x); flowLayer.add(s);
   const h = new THREE.Mesh(new THREE.ConeGeometry(0.28,0.6,12), mt); h.position.copy(b); h.rotation.z = -Math.PI/2; h.rotation.y = -Math.atan2(dir.z,dir.x); flowLayer.add(h); } }
 arrowPath([[24.6,12.6],[24.4,10.8],[24.35,4.2],[24.2,2.9],[33.3,2.9]], 0xef6c00); arrowPath([[33.6,3.1],[33.3,4.6]], 0xef6c00);
-const flowLbl = { el:mkLabel("Food queue (one way)", "item"), p:new THREE.Vector3(28.6,0.5,3.2), kind:"flow" }; LBL.push(flowLbl);
+const flowLbl = { el:mkTag("Food queue", "Food queue: one way, starting at the pantry end. Drinks are separate at the big wooden table.", "item"), p:new THREE.Vector3(28.6,0.5,3.2), kind:"flow" }; LBL.push(flowLbl);
 
 
 /* ================= build items ================= */
@@ -676,7 +691,7 @@ function keyOf(list, item){ return (list === state.all ? "all:" : "s:") + item.i
 function build(list, item, visible){
   const def = T[item.t]; if (!def) return; const g = def.b(); g.position.set(item.x, item.y||0, item.z); g.rotation.y = item.r||0; g.visible = visible;
   g.userData = { key:keyOf(list,item) }; scene.add(g);
-  let label = null; if (item.label){ label = { el:mkLabel(item.label, "item" + (item.cls?" "+item.cls:"")), p:new THREE.Vector3(), kind:"item", obj:g, y:item.t==="label"?0.6:(def.fp[0]>3?2.6:1.5) }; LBL.push(label); }
+  let label = null; if (item.label){ label = { el:mkTag(shortOf(item.id, item.label), item.label, "item" + (item.cls?" "+item.cls:"")), p:new THREE.Vector3(), kind:"item", obj:g, y:item.t==="label"?0.6:(def.fp[0]>3?2.6:1.5) }; LBL.push(label); }
   let ring = null; if (def.convo && !def.noRing){ const rad = Math.max(def.fp[0], def.fp[1])/2 + 0.15; ring = new THREE.Mesh(new THREE.RingGeometry(rad-0.1, rad, 48), new THREE.MeshBasicMaterial({ color:0x2e7d32, transparent:true, opacity:0.75, side:THREE.DoubleSide }));
     ring.rotation.x = -Math.PI/2; ring.position.set(item.x, 0.022, item.z); ring.visible = visible; convoLayer.add(ring); }
   objs.set(g.userData.key + (list === state.all ? "" : "@"+SLOTKEY(list)), { g, item, list, label, ring });
@@ -688,7 +703,7 @@ function forEachVisible(fn){ objs.forEach(o => { if (o.list === state.all || o.l
 
 /* ================= time + view ================= */
 const NOTES = {
-  "630":["6:30PM: doors open","Queue outside the door in 2 lines. Right at the entrance: 2 round registration counters + reception. Pay (PayNow or cash), get a wristband, then walk up to the food line and drinks. Eat at the yard tables."],
+  "630":["6:30PM: doors open","Queue outside the door in 2 lines. Right at the entrance: 2 round registration counters + reception. Pay (PayNow or cash), get a wristband, then walk up to the food line and drinks. Eat in the main chill area."],
   "8":["8PM: piñatas, then cake","8:00 everyone goes to Haven for 2 piñatas (cactus + unicorn) at the same time. Around 8:20 everyone comes back to the Loft stage for the giant cake. KTV, gaming and photobooth pause. The reception table stays by the door for late arrivals."],
   "9":["After the piñata + cake: organic activities","No fixed programme. Keep the stage floor open and support whatever people start (KTV on the screen with the Mac desk speaker, limbo, Granny, games). Food stays out for seconds."],
 };
@@ -746,15 +761,15 @@ document.getElementById("toolDel").addEventListener("click", () => { if (!sel) r
 document.getElementById("toolCopy").addEventListener("click", () => { if (!sel) return; const it = Object.assign(clone(sel.item), { id:sel.item.t + "-" + Date.now().toString(36), x:sel.item.x + 0.8, z:sel.item.z + 0.8 });
   sel.list.push(it); build(sel.list, it, true); save(); refresh(); select(findObj(sel.list, it)); });
 document.getElementById("toolLabel").addEventListener("input", e => { if (!sel) return; const v = e.target.value.trim(); sel.item.label = v || undefined;
-  if (sel.label){ if (v) sel.label.el.textContent = v; else { sel.label.el.remove(); LBL.splice(LBL.indexOf(sel.label),1); sel.label = null; } }
-  else if (v){ sel.label = { el:mkLabel(v, "item"), p:new THREE.Vector3(), kind:"item", obj:sel.g, y:1.5 }; LBL.push(sel.label); } save(); });
+  if (sel.label){ if (v){ sel.label.el.textContent = v; sel.label.el.dataset.short = v; delete sel.label.el.dataset.full; sel.label.el.classList.remove("more","open"); } else { sel.label.el.remove(); LBL.splice(LBL.indexOf(sel.label),1); sel.label = null; } }
+  else if (v){ sel.label = { el:mkTag(v, v, "item"), p:new THREE.Vector3(), kind:"item", obj:sel.g, y:1.5 }; LBL.push(sel.label); } save(); });
 window.addEventListener("keydown", e => { if (!EDIT || !sel || e.target.tagName === "INPUT") return; if (e.key === "r" || e.key === "R") rotate(-Math.PI/4); if (e.key === "Delete" || e.key === "Backspace") document.getElementById("toolDel").click(); if (e.key === "Escape") select(null); });
 
 const ray = new THREE.Raycaster(), mouse = new THREE.Vector2(), plane = new THREE.Plane(new THREE.Vector3(0,1,0), 0), hitP = new THREE.Vector3();
 let drag = null, down = null, downHit = false;
 function pick(e){ const r = canvas.getBoundingClientRect(); mouse.set((e.clientX-r.left)/r.width*2-1, -(e.clientY-r.top)/r.height*2+1); ray.setFromCamera(mouse, camera); }
 function objFromHit(obj){ while (obj && !obj.userData.key) obj = obj.parent; if (!obj) return null; for (const o of objs.values()) if (o.g === obj) return o; return null; }
-canvas.addEventListener("pointerdown", e => { down = [e.clientX, e.clientY]; downHit = false; if (!EDIT) return; pick(e);
+canvas.addEventListener("pointerdown", e => { document.querySelectorAll(".lbl.item.open").forEach(o => { o.classList.remove("open"); o.textContent = o.dataset.short; }); down = [e.clientX, e.clientY]; downHit = false; if (!EDIT) return; pick(e);
   const targets = []; forEachVisible(o => { if (o.item.t !== "label") targets.push(o.g); });
   const hits = ray.intersectObjects(targets, true).filter(h => h.object.visible && h.object.type === "Mesh");
   const o = hits.length ? objFromHit(hits[0].object) : null; downHit = !!o;
