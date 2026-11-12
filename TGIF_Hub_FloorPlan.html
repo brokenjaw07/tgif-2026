@@ -699,11 +699,11 @@ const ROOMS = [
    has:["Grey sofa, Persian rug, coffee table","2 red chairs, wooden lounge chair","TV on the wall","Stack of wooden benches"],
    setup:["Lyrics off YouTube on the wall TV, laptop on the coffee table","Speaker + mic next to the TV, sofa faces the singers","2 NanGuang lights in the corners, main lights off","No booking: just walk in"],
    watch:["Bring the portable speaker + 2 mics","Request the laptop from a ministry early","Check how much sound leaks into Haus 1 next door"] },
- { id:"mr1", name:"Mtg Rm 1", act:"Bag room", color:"#5d4037", floor:"tile", tint:"#bfb9b0", rects:[[17.2,0,3.0,3.6]], lbl:[18.7,2.2],
+ { id:"mr1", name:"Mtg Rm 2", act:"Bag room", color:"#5d4037", floor:"tile", tint:"#bfb9b0", rects:[[14.2,0,3.0,3.6]], lbl:[15.7,2.2],
    has:["Meeting table + chairs","Stacked chairs, 2 TV trolleys (1 goes to Haus 2)"],
    setup:["Racks (from Events) on the back + side wall, boxes on the other wall. A–F, G–L, M–R, S–Z, first letter of your name","Tape a walkway on the floor from the door, nothing goes on it","At registration: masking tape + marker, write your name on your bag","Sign on the door: BAGS 🎒. Phone + wallet stay with you"],
    watch:["Confirmed as the bag room. Racks still TBC with Events","Room is small (rough guess ~3 x 3.6m). 4 racks hold ~55 bags + the floor below them","Nobody guards it. Crew at reception keeps an eye on the corridor","Move the stacked chairs out (Haven) before bags come in"] },
- { id:"mr2", name:"Mtg Rm 2", act:"Photobooth", color:"#c2185b", floor:"tile", tint:"#bfb9b0", rects:[[14.2,0,3.0,3.6]], lbl:[15.7,2.2],
+ { id:"mr2", name:"Mtg Rm 1", act:"Photobooth", color:"#c2185b", floor:"tile", tint:"#bfb9b0", rects:[[17.2,0,3.0,3.6]], lbl:[18.7,2.2],
    has:["Meeting table + chairs"],
    setup:["TGIF'26 newspaper backdrop on the far wall","Props table: entry-proof cards, sombreros, funny sunglasses","Camera + photo printer from TOK"],
    watch:["~6 people max inside at once","Confirm with TOK who sets up the printer and who runs it","Only 1 photobooth now (the streamer one is dropped)"] },
@@ -1025,6 +1025,11 @@ function applyV24(st){ if (!st || !st.all || !st.s) return;
     if ((k === "8" || k === "9") && V24.shiftX[i.id] != null){ i.x = V24.shiftX[i.id]; i.z = V24.zBack[i.id]; i.r = 0; } }); });
   const E = st.s["8"]; if (E) E.forEach(i => { const c = V24.s8[i.id]; if (c) Object.assign(i, c); });
   const N = st.s["9"]; if (N) N.forEach(i => { const c = V24.s9[i.id]; if (c) Object.assign(i, c); }); }
+const V25 = { set:{ // photobooth -> Meeting Rm 1 (first room people see), bags -> Meeting Rm 2
+  mr2bd:{ x:18.7, z:0.12 }, mr2rl:{ x:18.7, z:2.5 }, mr2tb:{ x:17.85, z:2.95 },
+  rackA:{ x:14.95, z:0.3, r:0 }, rackB:{ x:16.45, z:0.3, r:0 }, rackC:{ x:14.5, z:1.35, r:Math.PI/2 }, rackD:{ x:14.5, z:2.65, r:Math.PI/2 },
+  mrTape:{ x:15.8, z:2.15 }, box1:{ x:16.9, z:1.2 }, box2:{ x:16.9, z:1.75 }, "adm-pb":{ x:18.6, z:4.0 }, "adm-bags":{ x:16.5, z:4.0 } } };
+function applyV25(st){ if (!st || !st.all) return; st.all.forEach(i => { const c = V25.set[i.id]; if (c) Object.assign(i, c); }); }
 function applyV17(st){ if (!st || !st.all || !st.s) return;
   st.all.forEach(i => { const c = V17.set[i.id]; if (c) Object.assign(i, c); });
   for (let i = st.all.length-1; i >= 0; i--) if (V17.del.includes(st.all[i].id)) st.all.splice(i,1);
@@ -1041,7 +1046,8 @@ function migrate(st){ if (!st) return st; if (st.have && !st.have._food2 && st.s
   if (st.have && !st.have._v21 && st.s){ applyV21(st); st.have._v21 = 1; }
   if (st.have && !st.have._v22 && st.s){ applyV22(st); st.have._v22 = 1; }
   if (st.have && !st.have._v23 && st.s){ applyV23(st); st.have._v23 = 1; }
-  if (st.have && !st.have._v24 && st.s){ applyV24(st); st.have._v24 = 1; } const walk = l => (l || []).forEach(i => { if (i.label) i.label = i.label.replace("Jagua tattoo ($1.50 / $3)","Henna tattoo").replace(/Jagua/g,"Henna").replace(/jagua/g,"henna");
+  if (st.have && !st.have._v24 && st.s){ applyV24(st); st.have._v24 = 1; }
+  if (st.have && !st.have._v25 && st.s){ applyV25(st); st.have._v25 = 1; } const walk = l => (l || []).forEach(i => { if (i.label) i.label = i.label.replace("Jagua tattoo ($1.50 / $3)","Henna tattoo").replace(/Jagua/g,"Henna").replace(/jagua/g,"henna");
     if (i.id === "h2rug" && i.t === "rug") i.t = "persian";
     if (i.id === "cubeL" && Math.abs(i.x - 34.0) < 0.01 && Math.abs(i.z - 1.3) < 0.01){ i.x = 35.65; i.z = 11.25; i.r = Math.PI/2; } });
   walk(st.all); Object.values(st.s || {}).forEach(walk); return st; }
@@ -1315,7 +1321,7 @@ const VIBES = {
   fiesta:{ n:"Fiesta bright", d:"Max colour. Papel picado everywhere, balloons, paper fans and giant paper flowers. Loud, fun, very photo-friendly.", items:[
     ["dPicado",24.25,10.4,0],["dPicado",37.5,4.6,0],["dPicado",37.5,8.6,0],["dPicado",16.6,4.85,0],["dPicado",9.5,3.0,0],["dPicado",9.5,9.8,0],
     ["dStreamers",24.25,12.15,0],["dBalloons",22.85,11.9,0],["dBalloons",25.75,11.9,0],["dBalloons",41.4,4.0,0],["dBalloons",41.4,8.8,0],["dBalloons",12.6,4.2,0],
-    ["dFans",26.0,1.25,0],["dFans",31.6,1.25,0],["dFans",37.5,1.25,0],["dPaperFlowers",15.7,0.12,0],["dPaperFlowers",6.12,6.4,Math.PI/2],
+    ["dFans",26.0,1.25,0],["dFans",31.6,1.25,0],["dFans",37.5,1.25,0],["dPaperFlowers",18.7,0.12,0],["dPaperFlowers",6.12,6.4,Math.PI/2],
     ["dSombrero",26.6,11.45,0],["dCactus",33.7,1.3,0]] },
   cantina:{ n:"Warm cantina", d:"Evening glow. Fairy lights and paper lanterns overhead, tea lights on the low tables, a few sombreros and cacti. Cosier, less loud.", items:[
     ["dLights",27.9,4.4,0],["dLights",27.9,7.0,0],["dLights",27.9,9.6,0],["dLanterns",37.5,4.6,0],["dLanterns",38.5,9.2,0],["dLanterns",9.5,6.4,0],["dLanterns",16.6,4.85,0],
@@ -1350,8 +1356,8 @@ const SPOTS = [
   { id:"haven", n:"👵 Haven", p:[12.3,10.6], l:[8.0,4.5] },
   { id:"game", n:"🎮 Gaming", p:[18.6,6.9], l:[21.0,11.5] },
   { id:"ktv", n:"🎤 KTV", p:[16.9,6.9], l:[13.5,10.5] },
-  { id:"pb2", n:"📸 Photobooth", p:[15.7,3.3], l:[15.7,0] },
-  { id:"bags", n:"🎒 Bag room", p:[19.6,3.3], l:[17.4,0.6] },
+  { id:"pb2", n:"📸 Photobooth", p:[18.7,3.3], l:[18.7,0] },
+  { id:"bags", n:"🎒 Bag room", p:[16.6,3.3], l:[14.4,0.6] },
 ];
 let WALK = false, walkSpot = null;
 const walkEl = document.getElementById("walk"), spotsEl = document.getElementById("spots");
@@ -1487,7 +1493,7 @@ function selectRoom(id, doFly){ const r = ROOMS.find(x => x.id === id); [...list
 const rc = document.getElementById("resetConfirm"); let pending = null;
 function askReset(kind, text){ pending = kind; rc.hidden = false; rc.innerHTML = `${text} <button class="btn" id="rcYes" style="border:1px solid var(--red);color:var(--red);background:var(--bg)">Yes, reset</button> <button class="btn" id="rcNo" style="border:1px solid var(--line);background:var(--bg)">Cancel</button>`;
   document.getElementById("rcYes").onclick = () => { if (pending === "slot") state.s[SLOT].splice(0, state.s[SLOT].length, ...clone(SLOTS[SLOT])); else { state.all.splice(0, state.all.length, ...clone(STATIC)); Object.keys(state.s).forEach(k => state.s[k].splice(0, state.s[k].length, ...clone(SLOTS[k]))); }
-    applyV17(state); applyV18(state); applyV19(state); applyV20(state); applyV21(state); applyV22(state); applyV23(state); applyV24(state);
+    applyV17(state); applyV18(state); applyV19(state); applyV20(state); applyV21(state); applyV22(state); applyV23(state); applyV24(state); applyV25(state);
     save(); rebuildAll(); setSlot(SLOT); rc.hidden = true; };
   document.getElementById("rcNo").onclick = () => { rc.hidden = true; }; }
 document.getElementById("resetSlot").addEventListener("click", () => askReset("slot", sharedOn ? "Put this time slot back to the original layout for everyone?" : "Put this time slot back to the original layout?"));
