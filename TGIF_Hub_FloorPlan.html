@@ -506,6 +506,17 @@ function decorLanterns(){ const g = new THREE.Group(); const pts = [];
 function decorCandles(y){ const g = new THREE.Group(); [[-0.15,0],[0.05,0.08],[0.18,-0.04]].forEach(([x,z],i) => {
     const h = 0.06 + i*0.03; g.add(CY(0.035,0.035,h,0xf3ead7,x,y+h/2,z,0.6));
     const f = new THREE.Mesh(new THREE.SphereGeometry(0.018,8,6), new THREE.MeshBasicMaterial({ color:0xffc14d })); f.scale.y = 1.6; f.position.set(x,y+h+0.02,z); g.add(f); }); return g; }
+function lowBedazzle(){ seedN = 77; const g = new THREE.Group();
+  [-0.6,0.6].forEach(x => { g.add(RB(0.52,0.32,0.36,0.03,0xb98a55,x,0.16,0,0.6)); });
+  g.add(B(1.8,0.04,0.75,0xe9e4da,0,0.36,0,0.6));
+  const gc = [0xff4fa3,0x40c4ff,0xffd740,0xb388ff,0x69f0ae,0xffffff];
+  [-0.6,-0.2,0.2,0.6].forEach((x,k) => { g.add(B(0.26,0.025,0.18,0xffffff,x,0.395,0,0.4));
+    const im = new THREE.InstancedMesh(new THREE.SphereGeometry(0.012,6,4), mat(gc[k%gc.length],0.2,0.3), 30); const o = new THREE.Object3D();
+    for (let i=0;i<30;i++){ o.position.set(x-0.11+rnd()*0.22, 0.412, -0.07+rnd()*0.14); o.updateMatrix(); im.setMatrixAt(i,o.matrix); } g.add(im); });
+  [-0.8,0.8].forEach(x => g.add(CY(0.02,0.02,0.1,0xffffff,x,0.43,0.2,0.4)));
+  return g; }
+function bagBox(){ const g = new THREE.Group(); g.add(B(0.5,0.4,0.4,0xc49a5e,0,0.2,0,0.85)); [-0.1,0.12].forEach((x,i) => g.add(RB(0.22,0.25,0.14,0.04,BAGC[i+2],x,0.42,0)) ); return g; }
+function floorTape(){ const g = new THREE.Group(); [-0.6,0.6].forEach(x => g.add(B(0.05,0.006,2.6,0xf4c430,x,0.004,0,0.6))); return g; }
 function bedazzle(){ const g = trestleSeats(); cloth(g,2.4,0.8); const gc = [0xff4fa3,0x40c4ff,0xffd740,0xb388ff,0x69f0ae,0xffffff];
   for (let i=0;i<14;i++) g.add(SP(0.035,gc[i%gc.length],-0.9+i*0.14,0.8,(i%3-1)*0.15,1,0.6,1,0.2)); g.add(B(0.3,0.06,0.2,0x9e9e9e,0.7,0.81,0.2)); return g; }
 function bracelets(){ const g = trestleSeats(); [[-0.8,0xe53935],[-0.4,0xfdd835],[0,0x43a047],[0.4,0x1e88e5],[0.8,0x8e24aa]].forEach(([x,c]) => g.add(CY(0.06,0.06,0.04,c,x,0.79,0))); return g; }
@@ -575,6 +586,9 @@ const T = {
   foodLong:{ n:"Food table (long, crew stands behind)", b:()=>{ const g = trestle(W.black,2.4,0.8); whiteCloth(g,2.4,0.8); return g; }, fp:[2.4,0.8], uses:{long:1}, add:true },
   bagZone: { n:"Bag zone (taped on the floor, ~12 bags)", b:bagZone, fp:[1.8,0.9], add:true },
   bagRack: { n:"Bag rack (ask Events, ~14 bags)", b:bagRack, fp:[1.2,0.45], add:true },
+  bagBox:  { n:"Box for bags", b:bagBox, fp:[0.5,0.4], add:true },
+  floorTape:{ n:"Floor tape walkway (2.6m)", b:floorTape, fp:[1.2,2.6], add:true },
+  lowBdz:  { n:"Bedazzling low table (chapel table on crates)", b:lowBedazzle, fp:[1.8,0.75], seats:6, uses:{chapel:1,crate:2}, add:true },
   nanguang:{ n:"NanGuang RGB light tube on a stand", b:nanguang, fp:[0.45,0.45], add:true },
   signFloor:{ n:"Admin: standing sign", b:signFloor, fp:[0.5,0.3], add:true },
   signTable:{ n:"Admin: table sign (A5)", b:signTable, fp:[0.22,0.15], onTable:true, add:true },
@@ -675,19 +689,19 @@ const INV = [ ["chapel","Foldable chapel tables",20], ["crate","Crates",40], ["r
 const ROOMS = [
   { id:"loft", name:"Loft", act:"Main party space", color:"#ef6c00", floor:"tile", tint:"#c6c1b9", rects:[[20.2,0.8,21.8,5.3],[22.4,6.1,19.6,6.3]], lbl:[31.0,3.95],
    has:["Pantry counter, fridge, water dispenser","Big wooden table with 3 pendant lamps, parallel to the pantry (can't move)","Black oval table with black chairs","2 puffy cream sofas on a rug, 2 cowhide cubes","Grey sofa, cream sofa, beanbag, plants, cube shelves","Curtains along the long wall","Mac desk + sound desk on the bottom wall (CANNOT MOVE)","~5 white round tables (not needed now that seating is yard style)"],
-   setup:["Door → 2 round registration counters on the left (PayNow QR, cash box, wristbands), reception desk on the right → food line or drinks","Food line: 3 self-serve tables against the wall right of the pillar. Starts at the EAST end: nachos bar, pasta + finger food, churros + fondue","Then the long crew table left of the pillar: DIY spuds + wraps, crew stands behind and serves (microwave in the pantry)","Mocktails on the big wooden table + the pay point next to it (seconds, Jarritos, 2nd mocktail). Lots of space there now","First portion + first mocktail are free","Main chill area: 2 rows of 3 chapel tables on crates in the middle, everyone sits on the carpets (no cushions)","Activity zones: friendship bracelets on the oval table + 2 round tables (QR for tutorials), henna (free) + a round table to sit and let it dry, bedazzling on 2 tables in front of the screen (limbo only comes out after the piñata), bedazzling on a long table just past the yard seating","Board games live on the shelf next to the puffy sofas. People play them in the main chill area or the lounge","Stage in front of the screen: limbo + pin the donkey before 8PM, the giant cake at 8:20, then open floor for organic activities","Chill area: puffy sofas in the corner past the Mac desk"],
+   setup:["Door → 2 round registration counters on the left (PayNow QR, cash box, wristbands), reception desk on the right → food line or drinks","Food line: 3 self-serve tables against the wall right of the pillar. Starts at the EAST end: nachos bar, pasta + finger food, churros + fondue","Then the long crew table left of the pillar: DIY spuds + wraps, crew stands behind and serves (microwave in the pantry)","Mocktails on the big wooden table + the pay point next to it (seconds, Jarritos, 2nd mocktail). Lots of space there now","First portion + first mocktail are free","Main chill area: 2 rows of 3 chapel tables on crates in the middle, everyone sits on the carpets (no cushions)","Activities: friendship bracelets + henna side by side along the back wall (each with a round table in front), bedazzling in the middle (1 long table + 1 round table by the screen, the round one becomes the cake table at 8PM). Sofa chill area in the corner as usual, bedazzling on a long table just past the yard seating","Board games live on the shelf next to the puffy sofas. People play them in the main chill area or the lounge","Stage in front of the screen: limbo + pin the donkey before 8PM, the giant cake at 8:20, then open floor for organic activities","Chill area: puffy sofas in the corner past the Mac desk"],
    watch:["The Mac desk area (red stripes) is off limits","The entrance is tight. The queue forms OUTSIDE the door in 2 lines, one per counter","Use the Mac desk speaker + sound desk for the emcee and Loft KTV (confirmed). Get someone who knows how to run it","Smoke detectors on the ceiling. Lots of lit candles at 8PM can set off the alarm. Check with the Hub IC or use LED candles","Yard tables don't need to move at 8PM. The piñata is in Haven and the cake is on the Loft stage"] },
- { id:"haus1", name:"Haus 1", act:"KTV Room", color:"#7b3fa0", floor:"concrete", tint:"#6d5a4a", rects:[[17.7,6.1,4.7,6.3]], lbl:[20.05,8.4],
+ { id:"haus1", name:"Haus 1", act:"Gaming Room", color:"#235c7f", floor:"concrete", tint:"#6d5a4a", rects:[[17.7,6.1,4.7,6.3]], lbl:[20.05,8.4],
    has:["Wooden sofa with cushions","2 armchairs + 1 white chair","Coffee table","TV on the wall","Shelves and paper lanterns"],
-   setup:["Sofa and armchairs face the TV, lyrics off YouTube","Speaker + mic stand next to the TV, laptop on the coffee table","2 NanGuang RGB lights in the back corners, main lights off","45 min sessions, booked in the bot"],
-   watch:["Bring the portable speaker + 2 mics (events has 1 clip mic, check)","Request the laptop from a ministry early","Check how much sound leaks into Haus 2 next door"] },
- { id:"haus2", name:"Haus 2", act:"Gaming Room", color:"#235c7f", floor:"tile", tint:"#b9b5ae", rects:[[13,6.1,4.7,6.3]], lbl:[15.35,8.0],
+   setup:["PS5 on the wall TV: wooden sofa + armchairs face it (4 controllers). EA FC 26, NBA 2K26, It Takes Two","Switch on the Haven TV trolley (it's movable) by the side wall, 3 black chairs in front (4 controllers). Games TBC","30 min turns. Sign-up sheet on the door"],
+   watch:["Count + charge all 8 controllers the night before","Extension cord for the trolley TV + Switch dock","Someone checks the 30 min turns so it's not the same 8 people all night"] },
+ { id:"haus2", name:"Haus 2", act:"KTV Room", color:"#7b3fa0", floor:"tile", tint:"#b9b5ae", rects:[[13,6.1,4.7,6.3]], lbl:[15.35,8.0],
    has:["Grey sofa, Persian rug, coffee table","2 red chairs, wooden lounge chair","TV on the wall","Stack of wooden benches"],
-   setup:["PS5 on the wall TV, grey sofa + red chairs face it (4 controllers): EA Sports FC 26, NBA 2K26, It Takes Two","Switch games: TBC","Switch on a TV trolley (from Meeting Rm 1), 3 bean bags in front (4 controllers)","Up to 8 people playing at once. Make it comfy: bean bags, floor cushions","Print the games list + 15 min turns sign-up on the door"],
-   watch:["Furniture is scarce, so bring the comfy stuff in","Count + charge controllers the night before","Extension cord for the trolley TV + Switch dock"] },
+   setup:["Lyrics off YouTube on the wall TV, laptop on the coffee table","Speaker + mic next to the TV, sofa faces the singers","2 NanGuang lights in the corners, main lights off","No booking: just walk in"],
+   watch:["Bring the portable speaker + 2 mics","Request the laptop from a ministry early","Check how much sound leaks into Haus 1 next door"] },
  { id:"mr1", name:"Mtg Rm 1", act:"Bag room", color:"#5d4037", floor:"tile", tint:"#bfb9b0", rects:[[17.2,0,3.0,3.6]], lbl:[18.7,2.2],
    has:["Meeting table + chairs","Stacked chairs, 2 TV trolleys (1 goes to Haus 2)"],
-   setup:["4 racks (ask Events): 2 on the back wall, 2 on the side wall. A–F, G–L, M–R, S–Z, first letter of your name","Big bags on the floor under the racks, the middle stays clear to the door","At registration: masking tape + marker, write your name on your bag","Sign on the door: BAGS 🎒. Phone + wallet stay with you"],
+   setup:["Racks (from Events) on the back + side wall, boxes on the other wall. A–F, G–L, M–R, S–Z, first letter of your name","Tape a walkway on the floor from the door, nothing goes on it","At registration: masking tape + marker, write your name on your bag","Sign on the door: BAGS 🎒. Phone + wallet stay with you"],
    watch:["Confirmed as the bag room. Racks still TBC with Events","Room is small (rough guess ~3 x 3.6m). 4 racks hold ~55 bags + the floor below them","Nobody guards it. Crew at reception keeps an eye on the corridor","Move the stacked chairs out (Haven) before bags come in"] },
  { id:"mr2", name:"Mtg Rm 2", act:"Photobooth", color:"#c2185b", floor:"tile", tint:"#bfb9b0", rects:[[14.2,0,3.0,3.6]], lbl:[15.7,2.2],
    has:["Meeting table + chairs"],
@@ -697,8 +711,8 @@ const ROOMS = [
    has:["Storage"], setup:["Spare cups, ice, piñata candy, cake, candles, prizes"], watch:["Crew only. Keep the door shut"] },
  { id:"haven", name:"Haven", act:"Mexican Granny", color:"#2e7d32", floor:"planks", tint:"#4a4744", rects:[[6,0,7,12.4]], lbl:[9.5,6.2],
    has:["Pull-out wall stays open, so it's one big room","Projector + screen + 2 wall speakers","Leather sofa, grey sofa","~45 black metal chairs","Main door from the corridor + 2 side doors at the back"],
-   setup:["2 Granny zones, one in each half, so 2 games run at once (2 pool noodles)","Granny wears a sombrero. Players try to snatch it, Granny tries to tag them","Stack the chairs and push the sofas against the walls","2 pool noodles (padded), a sombrero, a chair for the Granny"],
-   watch:["No slippers. Proper shoes or socks only","Have one crew member as game master to reset rounds","Before the event: Haven (and Haus 2) can be the staging area to prep stuff, then bring it out","8PM piñata happens here: stop the Granny game at 7:55, clear the floor, then it's piñata on a pole with 2 holders and a 2m safety circle","No TVs or trolleys in here (people will be running). The trolley TV goes to Haus 2"] },
+   setup:["2 Granny zones, one in each half, so 2 games run at once (2 pool noodles). 10 min games, 10 people per slot, booked in the bot","Granny wears a sombrero. Players try to snatch it, Granny tries to tag them","Empty room: move the sofas, chairs and rack out before the event (Store / corridor)","2 pool noodles (padded), a sombrero, a chair for the Granny"],
+   watch:["No slippers. Proper shoes or socks only","Have one crew member as game master to reset rounds","Before the event: Haven (and Haus 2) can be the staging area to prep stuff, then bring it out","Piñata is in the Loft now, not here. Stop Granny at 7:55 so everyone goes to the Loft for the 8:00 photo","The Haven TV trolley goes to Haus 1 for the Switch"] },
 ];
 const CORR = [[13,3.6,7.2,2.5]];
 
@@ -909,6 +923,108 @@ function applyV20(st){ if (!st || !st.all || !st.s) return;
     L.forEach(i => { const c = V20.set630[i.id]; if (c) Object.assign(i, c); });
     V20.add630.forEach(it => { if (!L.find(x => x.id === it.id)) L.push(clone(it)); }); addFoodSet(st); }
   const N = st.s["9"]; if (N) V20.add9.forEach(it => { if (!N.find(x => x.id === it.id)) N.push(clone(it)); }); }
+const V21 = {
+  set:{ // Haus 1 = Gaming (PS5 on the wall TV, Switch on the Haven TV trolley), Haus 2 = KTV
+        h1tv:{ label:"PS5 (4 controllers)" }, h2tv:{ label:"TV + lyrics (YouTube karaoke)" },
+        h2tv2:{ x:22.25, z:7.6, r:-Math.PI/2, label:"Switch on the Haven TV trolley (4 controllers)" },
+        h2bb1:{ x:21.0, z:7.2, r:Math.PI/2 }, h2bb2:{ x:21.0, z:8.15, r:Math.PI/2 }, h1cush1:{ x:20.2, z:7.6, r:Math.PI/2 }, h1white:{ x:18.2, z:7.0, r:Math.PI },
+        h1spk:{ x:13.5, z:10.7, r:Math.PI/2 }, h1mic:{ x:14.0, z:10.2 }, ng1:{ x:17.4, z:11.95 }, ng2:{ x:17.4, z:6.45 },
+        "adm-ktv":{ label:"Sign: KTV, just walk in (no booking)" }, "adm-game":{ label:"Sign: Gaming, 30 min turns" },
+        // activities in rows: bracelets (back wall), henna (middle), bedazzling (sofas)
+        "adm-henna":{ x:37.75, z:4.85, y:null }, "adm-bdz":{ x:40.0, z:10.6, y:null, r:-Math.PI/2 },
+        // bag room: walkway tape + boxes
+      },
+  del:["adm-don"],
+  all:[ { id:"bdzL1", t:"lowBdz", x:37.7, z:10.6, r:0, label:"Bedazzling: sit on the puffy sofas" }, { id:"bdzL2", t:"lowBdz", x:39.5, z:10.6, r:0, label:"Bedazzling" },
+        { id:"mrTape", t:"floorTape", x:18.8, z:2.15, r:0, label:"Tape: walkway" }, { id:"box1", t:"bagBox", x:19.9, z:1.2, r:Math.PI/2, label:"Bag boxes" }, { id:"box2", t:"bagBox", x:19.9, z:1.75, r:Math.PI/2 } ],
+  slots:{ jag:{ x:37.0, z:5.0, r:0 }, oval:{ x:36.6, z:2.5 } },
+  delSlots:["bdz","bdz2","don","lim","brR2"],
+  set630:{ brR1:{ x:38.8, z:2.5, label:"Friendship bracelets: more seats (+ the grey sofa)" }, hnR1:{ x:39.4, z:5.0, label:"Henna: sit here + let it dry" } } };
+function applyV21(st){ if (!st || !st.all || !st.s) return;
+  st.all.forEach(i => { const c = V21.set[i.id]; if (c) Object.assign(i, c); });
+  for (let i = st.all.length-1; i >= 0; i--) if (V21.del.includes(st.all[i].id)) st.all.splice(i,1);
+  V21.all.forEach(it => { if (!st.all.find(x => x.id === it.id)) st.all.push(clone(it)); });
+  Object.values(st.s).forEach(L => { for (let i = L.length-1; i >= 0; i--) if (V21.delSlots.includes(L[i].id)) L.splice(i,1);
+    L.forEach(i => { const c = V21.slots[i.id]; if (c) Object.assign(i, c); }); });
+  const L = st.s["630"]; if (L) L.forEach(i => { const c = V21.set630[i.id]; if (c) Object.assign(i, c); }); }
+const V22 = {
+  set:{ // sofas out of the Loft corner: grey sofa + 1 puffy to Gaming (Haus 1), 1 puffy to KTV (Haus 2)
+        greyL:{ x:18.15, z:10.2, r:Math.PI/2, label:"Grey sofa (moved from the Loft)" }, h1arm1:{ x:21.9, z:9.4, r:-Math.PI*0.25 },
+        puffy2:{ x:20.4, z:7.45, r:Math.PI/2, label:"Puffy sofa (moved from the Loft), faces the Switch" }, rugL:{ x:20.1, z:7.6, r:0, label:"Rug (moved from the Loft)" },
+        puffy1:{ x:15.1, z:11.9, r:Math.PI, label:"Puffy sofa (moved from the Loft)" },
+        h2bb1:{ x:15.9, z:7.3, r:Math.PI }, h2bb2:{ x:16.9, z:7.6, r:Math.PI }, h1cush1:{ x:34.9, z:9.0, r:0 }, bbL:{ x:34.9, z:8.0, r:0 },
+        cow1:{ x:37.6, z:11.6 }, "adm-henna":{ x:40.15, z:11.15, y:null }, "adm-bdz":{ x:40.3, z:5.35, y:null, r:0 } },
+  del:["bdzL1","bdzL2"],
+  slots:{ jag:{ x:39.4, z:11.3, r:0 } },
+  act:[ { id:"brR1", t:"tulip4", x:38.75, z:2.5, r:0, label:"Friendship bracelets" }, { id:"brR2", t:"tulip4", x:40.65, z:2.5, r:0, label:"Friendship bracelets" },
+        { id:"bdzM1", t:"bedazzle", x:40.3, z:6.4, r:Math.PI/2, label:"Bedazzling (by the screen)" }, { id:"bdzM2", t:"bedazzle", x:38.0, z:6.4, r:Math.PI/2, label:"Bedazzling" },
+        { id:"hnR1", t:"tulip4t", x:37.0, z:8.9, r:0, label:"Henna: sit + let it dry" }, { id:"hnR2", t:"tulip4t", x:39.0, z:8.9, r:0, label:"Henna: sit + let it dry" } ],
+  s8:{ pin:{ x:26.0, z:8.3, label:"8:05 Piñata 1 in the Loft (bat, 2m clear)" }, pin2:{ x:29.0, z:8.3, label:"8:05 Piñata 2 in the Loft (bat, 2m clear)" },
+       lblHv8:{ x:27.5, z:10.3, label:"Everyone stands outside the circles. Chapel tables shifted into an L to make space" },
+       cake:{ label:"Cake after the piñatas (time TBC)" }, crowd:{ label:"Everyone comes here for the cake" } },
+  L:{ yB1:{ x:31.6, z:6.9, r:Math.PI/2 }, yB2:{ x:31.6, z:8.7, r:Math.PI/2 } },
+  add9:[ { id:"lim", t:"limbo", x:27.5, z:8.7, r:0, label:"8:15 Limbo, where the piñatas were (in the OOE)" } ] };
+function applyV22(st){ if (!st || !st.all || !st.s) return;
+  st.all.forEach(i => { const c = V22.set[i.id]; if (c) Object.assign(i, c); });
+  for (let i = st.all.length-1; i >= 0; i--) if (V22.del.includes(st.all[i].id)) st.all.splice(i,1);
+  Object.values(st.s).forEach(L => L.forEach(i => { const c = V22.slots[i.id]; if (c) Object.assign(i, c); }));
+  ["630","9"].forEach(k => { const L = st.s[k]; if (!L) return; V22.act.forEach(it => { const ex = L.find(x => x.id === it.id); if (ex) Object.assign(ex, clone(it)); else L.push(clone(it)); }); });
+  ["8","9"].forEach(k => { const L = st.s[k]; if (!L) return; for (let i = L.length-1; i >= 0; i--) if (L[i].id === "yB3" || L[i].id === "lim") L.splice(i,1);
+    L.forEach(i => { const c = V22.L[i.id]; if (c) Object.assign(i, c); }); });
+  const E = st.s["8"]; if (E) E.forEach(i => { const c = V22.s8[i.id]; if (c) Object.assign(i, c); });
+  const N = st.s["9"]; if (N) V22.add9.forEach(it => { if (!N.find(x => x.id === it.id)) N.push(clone(it)); }); }
+const V23 = {
+  set:{ // lounge back to a sofa chill area
+        puffy1:{ x:38.6, z:9.45, r:0, label:null }, puffy2:{ x:38.6, z:11.75, r:Math.PI, label:null }, rugL:{ x:38.6, z:10.6, r:0, label:"Chill area: sofas + conversation cards" },
+        cow1:{ x:36.35, z:10.6 }, cow2:{ x:40.85, z:10.6 }, creamL:{ x:41.5, z:10.6, r:-Math.PI/2 }, bbL:{ x:36.4, z:8.8, r:0 }, greyL:{ x:41.5, z:2.4, r:-Math.PI/2, label:null },
+        // Haus 1 back to its own furniture (+ Switch, bean bags)
+        h1arm1:{ x:18.5, z:10.7, r:Math.PI*0.25 }, h2bb1:{ x:21.0, z:7.2, r:Math.PI/2 }, h2bb2:{ x:21.0, z:8.15, r:Math.PI/2 }, h1cush1:{ x:20.2, z:7.6, r:Math.PI/2 },
+        "adm-ktv":{ label:"Sign: KTV, just walk in" }, "adm-game":{ label:"Sign: Gaming, book a 30 min slot in the bot" },
+        "adm-henna":{ x:39.95, z:3.55, y:null, r:0 }, "adm-bdz":{ x:39.6, z:6.0, y:null, r:0 } },
+  del:["hvLeather","hvGrey","hvStack1","hvStack2","hvStack3"],   // nothing in Haven
+  dropSlot:["bdzM1","bdzM2","brR2","hnR2","bdz","bdz2","lim"],
+  slot:{ oval:{ x:36.6, z:2.5, r:0, label:"Friendship bracelets" }, jag:{ x:39.2, z:2.5, r:0, label:"Henna tattoo (free)" } },
+  act:[ { id:"brR1", t:"tulip4", x:36.6, z:4.6, r:0, label:"Friendship bracelets: more seats" },
+        { id:"hnR1", t:"tulip4t", x:39.4, z:4.6, r:0, label:"Henna: sit here + let it dry" },
+        { id:"bdzA", t:"bedazzle", x:37.9, z:7.0, r:0, label:"Bedazzling" } ],
+  bdzRound:{ id:"bdzB", t:"tulip4t", x:40.6, z:7.0, r:0, label:"Bedazzling (round table, becomes the cake table at 8PM)" },
+  fwd:{ yA1:4.6, yA2:4.6, yA3:4.6, yB1:7.3, yB2:7.3, yB3:7.3 },
+  s8:{ pin:{ x:25.0, z:10.1, r:0, label:"8:05 Piñata 1 (bat, keep the circle clear)" }, pin2:{ x:28.0, z:10.1, r:0, label:"8:05 Piñata 2 (bat, keep the circle clear)" },
+       lblHv8:{ x:26.5, z:12.0, label:"Chill tables just move forward a bit. Everyone stands outside the circles" },
+       rec:{ x:23.0, z:8.6, r:Math.PI/2, label:"Reception: late arrivals wait here during the piñata" },
+       cake:{ x:40.6, z:7.0, r:0, label:"Cake on the round bedazzling table (after the piñatas)" }, crowd:{ x:33.6, z:7.0, label:"Everyone gathers here for the cake" },
+       mic8:{ x:39.6, z:8.6 } },
+  add9:[ { id:"lim", t:"limbo", x:26.5, z:10.1, r:0, label:"8:15 Limbo, where the piñatas were" } ] };
+function applyV23(st){ if (!st || !st.all || !st.s) return;
+  const put = (i, c) => Object.entries(c).forEach(([k,v]) => { if (v === null) delete i[k]; else i[k] = v; });
+  st.all.forEach(i => { const c = V23.set[i.id]; if (c) put(i, c); });
+  for (let i = st.all.length-1; i >= 0; i--) if (V23.del.includes(st.all[i].id)) st.all.splice(i,1);
+  Object.entries(st.s).forEach(([k,L]) => {
+    for (let i = L.length-1; i >= 0; i--) if (V23.dropSlot.includes(L[i].id)) L.splice(i,1);
+    L.forEach(i => { const c = V23.slot[i.id]; if (c) put(i, c); });
+    V23.act.forEach(it => { const ex = L.find(x => x.id === it.id); if (ex) Object.assign(ex, clone(it)); else L.push(clone(it)); });
+    if (k !== "8" && !L.find(x => x.id === "bdzB")) L.push(clone(V23.bdzRound));
+    if (k === "8" || k === "9"){ if (!L.find(x => x.id === "yB3")) L.push({ id:"yB3", t:"yard", x:29.7, z:8.3, r:0 });
+      L.forEach(i => { if (V23.fwd[i.id] != null){ i.z = V23.fwd[i.id]; if (i.id === "yB1"){ i.x = 26.1; i.r = 0; } if (i.id === "yB2"){ i.x = 27.9; i.r = 0; } } }); } });
+  const E = st.s["8"]; if (E) E.forEach(i => { const c = V23.s8[i.id]; if (c) put(i, c); });
+  const N = st.s["9"]; if (N) V23.add9.forEach(it => { if (!N.find(x => x.id === it.id)) N.push(clone(it)); }); }
+const V24 = {
+  // Haus 1: black chairs facing the Switch instead of bean bags
+  set:{ h2bb1:{ t:"tolix", x:20.9, z:7.0, r:Math.PI/2, label:"Chairs facing the Switch" }, h2bb2:{ t:"tolix", x:20.9, z:7.7, r:Math.PI/2 }, h1cush1:{ t:"tolix", x:20.9, z:8.4, r:Math.PI/2 },
+        "adm-bdz":{ x:40.4, z:5.5, y:null, r:0 } },
+  slot:{ bdzA:{ x:40.4, z:7.0, r:Math.PI/2 }, bdzB:{ x:37.6, z:7.0, r:0, label:"Round table: bedazzling, becomes the cake table at 8PM" } },
+  s8:{ cake:{ x:37.6, z:7.0, r:0, label:"Cake on the round table (after the piñatas)" }, crowd:{ x:33.4, z:7.0 },
+       pin:{ x:24.0, z:5.0, label:"8:05 Piñata 1 (bat, keep the circle clear)" }, pin2:{ x:24.3, z:9.0, label:"8:05 Piñata 2 (bat, keep the circle clear)" },
+       lblHv8:{ x:25.4, z:7.0, label:"Everyone stands outside the circles. Chill tables shift right a bit" },
+       rec:{ x:26.6, z:11.45, r:Math.PI, label:"Reception: late arrivals + help desk" } },
+  shiftX:{ yA1:26.9, yA2:28.7, yA3:30.5, yB1:26.9, yB2:28.7, yB3:30.5 }, zBack:{ yA1:5.2, yA2:5.2, yA3:5.2, yB1:8.3, yB2:8.3, yB3:8.3 },
+  s9:{ lim:{ x:24.2, z:7.0, r:Math.PI/2, label:"8:15 Limbo, where the piñatas were" } } };
+function applyV24(st){ if (!st || !st.all || !st.s) return;
+  st.all.forEach(i => { const c = V24.set[i.id]; if (c) Object.assign(i, c); });
+  Object.entries(st.s).forEach(([k,L]) => { L.forEach(i => { const c = V24.slot[i.id]; if (c) Object.assign(i, c);
+    if ((k === "8" || k === "9") && V24.shiftX[i.id] != null){ i.x = V24.shiftX[i.id]; i.z = V24.zBack[i.id]; i.r = 0; } }); });
+  const E = st.s["8"]; if (E) E.forEach(i => { const c = V24.s8[i.id]; if (c) Object.assign(i, c); });
+  const N = st.s["9"]; if (N) N.forEach(i => { const c = V24.s9[i.id]; if (c) Object.assign(i, c); }); }
 function applyV17(st){ if (!st || !st.all || !st.s) return;
   st.all.forEach(i => { const c = V17.set[i.id]; if (c) Object.assign(i, c); });
   for (let i = st.all.length-1; i >= 0; i--) if (V17.del.includes(st.all[i].id)) st.all.splice(i,1);
@@ -921,7 +1037,11 @@ function migrate(st){ if (!st) return st; if (st.have && !st.have._food2 && st.s
   if (st.have && !st.have._v17 && st.s){ applyV17(st); st.have._v17 = 1; }
   if (st.have && !st.have._v18 && st.s){ applyV18(st); st.have._v18 = 1; }
   if (st.have && !st.have._v19 && st.s){ applyV19(st); st.have._v19 = 1; }
-  if (st.have && !st.have._v20 && st.s){ applyV20(st); st.have._v20 = 1; } const walk = l => (l || []).forEach(i => { if (i.label) i.label = i.label.replace("Jagua tattoo ($1.50 / $3)","Henna tattoo").replace(/Jagua/g,"Henna").replace(/jagua/g,"henna");
+  if (st.have && !st.have._v20 && st.s){ applyV20(st); st.have._v20 = 1; }
+  if (st.have && !st.have._v21 && st.s){ applyV21(st); st.have._v21 = 1; }
+  if (st.have && !st.have._v22 && st.s){ applyV22(st); st.have._v22 = 1; }
+  if (st.have && !st.have._v23 && st.s){ applyV23(st); st.have._v23 = 1; }
+  if (st.have && !st.have._v24 && st.s){ applyV24(st); st.have._v24 = 1; } const walk = l => (l || []).forEach(i => { if (i.label) i.label = i.label.replace("Jagua tattoo ($1.50 / $3)","Henna tattoo").replace(/Jagua/g,"Henna").replace(/jagua/g,"henna");
     if (i.id === "h2rug" && i.t === "rug") i.t = "persian";
     if (i.id === "cubeL" && Math.abs(i.x - 34.0) < 0.01 && Math.abs(i.z - 1.3) < 0.01){ i.x = 35.65; i.z = 11.25; i.r = Math.PI/2; } });
   walk(st.all); Object.values(st.s || {}).forEach(walk); return st; }
@@ -1092,9 +1212,7 @@ cbox(0.3,0.06,12.2,mTray,7.5,ROOM_H-0.25,6.2); cbox(0.3,0.06,6.2,mTray,19.0,ROOM
 cbox(2.1,1.45,0.03,new THREE.MeshBasicMaterial({ color:0xf7f7f5 }),9.5,1.95,0.1); cbox(2.2,0.06,0.06,mWire,9.5,2.7,0.12);
 [7.6,11.4].forEach(x => cbox(0.4,0.6,0.3,mWire,x,2.45,0.25)); cbox(0.4,0.15,0.35,mAC,9.5,ROOM_H-0.45,3.4); cbox(0.02,0.4,0.02,mWire,9.5,ROOM_H-0.2,3.4);
 cbox(0.04,0.15,0.35,new THREE.MeshBasicMaterial({ color:0x2ecc71 }),6.1,2.3,4.5);
-// Haven floor fixture: chrome wire rack against the north wall (always visible)
-{ const g = new THREE.Group(); [0.15,0.45,0.75].forEach(y => g.add(B(1.2,0.02,0.4,W.steel,0,y,0,0.3,0.8))); [[-0.58,-0.18],[0.58,-0.18],[-0.58,0.18],[0.58,0.18]].forEach(([x,z]) => g.add(CY(0.012,0.012,0.8,W.steel,x,0.4,z,0.3,0.8)));
-  g.position.set(7.4,0,0.35); scene.add(g); }
+
 // wall colours when walking in: Loft walls are charcoal, the other rooms are white
 const wallLoft = new THREE.MeshStandardMaterial({ color:0x48494c, roughness:0.95 }), wallRoom = new THREE.MeshStandardMaterial({ color:0xe9e7e2, roughness:0.95, emissive:0x3c3b39 });
 const SKINS = new THREE.Group(); SKINS.visible = false; scene.add(SKINS);
@@ -1111,7 +1229,7 @@ function mkLabel(html, cls){ const el = document.createElement("div"); el.classN
 // short name on the plan, tap it to see the full note
 const SHORT = { f1:"3. Churros + fondue", f2:"Spuds + wraps (crew)", f3:"2. Pasta + finger food", f4:"1. Nachos bar", brR1:"Bracelets", brR2:"Bracelets", hnR1:"Henna (drying)", bdz2:"Bedazzling", communal:"DIY mocktails", regA:"Registration", regB:"Registration", rec:"Reception",
   oval:"Bracelets", jag:"Henna", bdz:"Bedazzling", lim:"Limbo", don:"Pin the donkey", lblYard:"Main chill area", lblYard8:"Main chill area", lblYard9:"Main chill area",
-  rugL:"Chill area", cubeL:"Board games", binP:"Bin", h1tv:"TV + lyrics", h2tv:"PS5", h2tv2:"Switch", h1spk:"Speaker", mr2bd:"Photobooth", mr2tb:"Props", rackA:"Bags A–F", rackB:"Bags G–L", rackC:"Bags M–R", rackD:"Bags S–Z", ng1:"NanGuang", ng2:"NanGuang", "adm-pay":"Pay point",
+  rugL:"Rug", cubeL:"Board games", binP:"Bin", h1tv:"PS5", h2tv:"Lyrics TV", h2tv2:"Switch", h1spk:"Speaker", mr2bd:"Photobooth", mr2tb:"Props", bdzA:"Bedazzling", bdzB:"Round table (→ cake)", rugL:"Chill area", box1:"Bag boxes", mrTape:"Walkway tape", rackA:"Bags A–F", rackB:"Bags G–L", rackC:"Bags M–R", rackD:"Bags S–Z", ng1:"NanGuang", ng2:"NanGuang", "adm-pay":"Pay point",
   hvG:"Mexican Granny", hvG1:"Granny 1", hvG2:"Granny 2", hvStack3:"Spare chairs", pin:"Cactus piñata", pin2:"Unicorn piñata", lblHv8:"Stand outside the circles", cake:"Giant cake", crowd:"Cake crowd", mic8:"Emcee", lbl9:"Open floor" };
 function shortOf(id, text){ if (SHORT[id]) return SHORT[id]; let s = text.replace(/^(Sign|QR): /,"$1 ").split(/[:(]/)[0].trim(); return s.length > 24 ? s.slice(0,22).trim() + "…" : s; }
 function mkTag(short, full, cls){ const el = mkLabel("", cls); el.textContent = short; el.dataset.short = short;
@@ -1157,7 +1275,7 @@ function settle(){ let n = 0; scene.updateMatrixWorld(true); forEachVisible(o =>
 /* ================= time + view ================= */
 const NOTES = {
   "630":["6:30PM: doors open","Queue outside the door in 2 lines. Right at the entrance: 2 round registration counters + reception. Pay (PayNow or cash), get a wristband, then walk up to the food line and drinks. Eat in the main chill area."],
-  "8":["8PM: piñatas, then cake","8:00 everyone goes to Haven for 2 piñatas (cactus + unicorn) at the same time. Around 8:20 everyone comes back to the Loft stage for the giant cake. KTV, gaming and photobooth pause. The reception table stays by the door for late arrivals."],
+  "8":["8PM: piñatas, then cake","8:00 mass photo + confetti. 8:05 two piñatas at the back of the Loft (pantry end, by the corridor). The chill tables shift right a bit, nothing else moves. Then the cake goes on the round table next to bedazzling. 8:15 limbo where the piñatas were. KTV, gaming and photobooth pause."],
   "9":["After the piñata + cake: organic activities","No fixed programme. Keep the stage floor open and support whatever people start (KTV on the screen with the Mac desk speaker, limbo, Granny, games). Food stays out for seconds."],
 };
 function setSlot(s){ invalidate(true); SLOT = s; objs.forEach(o => { const vis = o.list === state.all || o.list === state.s[s]; o.g.visible = vis; if (o.ring) o.ring.visible = vis; });
@@ -1226,12 +1344,12 @@ const SPOTS = [
   { id:"drinks", n:"🍹 Drinks", p:[24.8,4.8], l:[22.4,2.0] },
   { id:"chill", n:"🛋️ Main chill area", p:[23.6,6.75], l:[31,6.75] },
   { id:"mid", n:"🎉 Middle of the Loft", p:[32.5,9.0], l:[25,3.0] },
-  { id:"craft", n:"🧶 Crafts + henna", p:[36.8,6.2], l:[37.6,2.0] },
+  { id:"craft", n:"🧶 Bracelets, henna, bedazzling", p:[34.6,6.2], l:[39.0,3.5] },
   { id:"stage", n:"🕺 Stage", p:[33.4,6.4], l:[42,6.4] },
-  { id:"lounge", n:"🛋️ Sofas + board games", p:[34.0,8.2], l:[38.5,11.0] },
+  { id:"lounge", n:"🛋️ Sofa chill area", p:[34.0,8.2], l:[38.5,11.0] },
   { id:"haven", n:"👵 Haven", p:[12.3,10.6], l:[8.0,4.5] },
-  { id:"ktv", n:"🎤 KTV", p:[18.6,6.9], l:[21.0,11.5] },
-  { id:"game", n:"🎮 Gaming", p:[16.9,6.9], l:[13.5,10.5] },
+  { id:"game", n:"🎮 Gaming", p:[18.6,6.9], l:[21.0,11.5] },
+  { id:"ktv", n:"🎤 KTV", p:[16.9,6.9], l:[13.5,10.5] },
   { id:"pb2", n:"📸 Photobooth", p:[15.7,3.3], l:[15.7,0] },
   { id:"bags", n:"🎒 Bag room", p:[19.6,3.3], l:[17.4,0.6] },
 ];
@@ -1369,7 +1487,7 @@ function selectRoom(id, doFly){ const r = ROOMS.find(x => x.id === id); [...list
 const rc = document.getElementById("resetConfirm"); let pending = null;
 function askReset(kind, text){ pending = kind; rc.hidden = false; rc.innerHTML = `${text} <button class="btn" id="rcYes" style="border:1px solid var(--red);color:var(--red);background:var(--bg)">Yes, reset</button> <button class="btn" id="rcNo" style="border:1px solid var(--line);background:var(--bg)">Cancel</button>`;
   document.getElementById("rcYes").onclick = () => { if (pending === "slot") state.s[SLOT].splice(0, state.s[SLOT].length, ...clone(SLOTS[SLOT])); else { state.all.splice(0, state.all.length, ...clone(STATIC)); Object.keys(state.s).forEach(k => state.s[k].splice(0, state.s[k].length, ...clone(SLOTS[k]))); }
-    applyV17(state); applyV18(state); applyV19(state); applyV20(state);
+    applyV17(state); applyV18(state); applyV19(state); applyV20(state); applyV21(state); applyV22(state); applyV23(state); applyV24(state);
     save(); rebuildAll(); setSlot(SLOT); rc.hidden = true; };
   document.getElementById("rcNo").onclick = () => { rc.hidden = true; }; }
 document.getElementById("resetSlot").addEventListener("click", () => askReset("slot", sharedOn ? "Put this time slot back to the original layout for everyone?" : "Put this time slot back to the original layout?"));
