@@ -84,7 +84,7 @@
   .shead .where{font-weight:800;opacity:.95}
   .x{position:absolute;right:12px;top:12px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.25);color:#fff;font-size:18px;cursor:pointer}
   .steps{list-style:none;margin:0;padding:16px 18px 4px;display:grid;gap:10px;counter-reset:s}
-  .steps li{display:flex;gap:10px;align-items:flex-start;counter-increment:s}
+  .steps li{white-space:pre-line;display:flex;gap:10px;align-items:flex-start;counter-increment:s}
   .steps li::before{content:counter(s);flex:none;width:26px;height:26px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font-weight:900;font-size:13px}
   .links{padding:8px 18px 0;display:flex;flex-wrap:wrap;gap:8px}
   .lk{border:2.5px solid var(--ink);background:var(--yellow);color:var(--ink);border-radius:999px;padding:9px 14px;font:800 14px var(--body);box-shadow:2px 2px 0 var(--ink);cursor:pointer}
@@ -209,38 +209,38 @@ const STATIONS = [
   { id:"reg", em:"🎟️", name:"Registration", where:"Loft, at the entrance", c:"#e63946",
     how:["Pay at the counter: cash or PayNow", "Get your wristband and you're in 🎉"], links:[] },
   { id:"bags", em:"🎒", name:"Bag room", where:"Meeting Room 2", c:"#5d4037",
-    how:["Write your name on your bag (tape + marker at registration)", "Racks go by the first letter of your name: A–F, G–L, M–R, S–Z", "Keep your phone + wallet with you"], links:[] },
+    how:["Store your bags here! Remember where you put yours", "Keep your phone + wallet with you"], links:[] },
   { id:"food", em:"🌮", name:"Food", where:"Loft, along the curtains", c:"#ff7a00",
-    how:["Your first plate is free", "The line starts at the far end: nachos bar, pasta + finger food, churros + chocolate fondue",
-         "Then the crew table left of the pillar: DIY wraps + spuds (get a spud number in the app)", "Seconds: pay at the pay point next to the mocktails"], links:[] },
+    how:["Your first plate is free 🎉", "On the menu: nachos bar, pasta, finger food, churros + chocolate fondue, DIY wraps, DIY spuds",
+         "DIY wraps: wear the gloves when you wrap. Crew will help you with the toppings", "Seconds: scan the PayNow QR code and pay"], links:[] },
   { id:"spud", em:"🥔", name:"DIY Spuds", where:"Loft, crew table left of the pillar", c:"#c46a1b",
     how:["At the spud table: pick your toppings", "Tap \"Get a spud number\" below 👇 and show crew your screen. They write your number on the foil",
          "Your spud goes in the oven. Go chill", "We'll message you on Telegram when it's out. Come collect!"], links:[] },
-  { id:"drinks", em:"🍹", name:"DIY Mocktails", where:"Loft, big wooden table by the pantry", c:"#ffb000",
-    how:["Your first mocktail is free. Mix your own", "Get your face printed on your straw 😎 (send your pic to the crew printer)", "2nd mocktail + Jarritos: pay at the pay point next to it"], links:[] },
+  { id:"drinks", em:"🍹", name:"Mocktails", where:"Loft, big wooden table by the pantry", c:"#ffb000",
+    how:["Your first drink is free. Crew will mark your wristband", "Crew will make your mocktail for you 🍹", "Get your face printed and stick it on your straw! 😎", "More drinks: scan the PayNow QR code and pay"], links:[] },
   { id:"chill", em:"🛋️", name:"Chill areas", where:"Loft: middle + sofas in the far corner", c:"#c0573d",
     how:["Main chill area: low tables in the middle of the Loft, sit on the carpets and eat", "Sofas in the far corner, for when you just want to talk",
          "Board games shelf next to the sofas: Avalon, Uno, Assets and more"], links:[] },
   { id:"brace", em:"🧶", name:"Friendship bracelets", where:"Loft, black oval table", c:"#3fae49",
-    how:["Pick 3 colours of yarn, knot them together", "Braid until it fits your wrist, then tie it on", "Make 2 and give one to someone you met tonight 🫶"],
+    how:["Pick 3 colours of yarn, knot them together", "Braid until it fits your wrist, then tie it on"],
     links:[{ t:"Step-by-step with photos", u:"https://www.instructables.com/id/-DIY-Braided-Bracelet-quick-easy-how-to-tutorial/" },
            { t:"More easy styles", u:"https://www.lovecrafts.com/blogs/articles/how-to-make-friendship-bracelets" }] },
-  { id:"jagua", em:"🌿", name:"Henna (free!)", where:"Loft, next to the bracelets", c:"#b5541c",
-    how:["Pick a small design (inspo below). Max 20 min so everyone gets a turn",
+  { id:"jagua", em:"🌿", name:"Henna", where:"Loft, next to the bracelets", c:"#b5541c",
+    how:["Pick a small design (inspo below). Keep it simple so others get a turn too",
          "Aftercare: let it dry and don't touch it. Leave the paste on 2+ hours, then scrape it off (no soap)",
          "Itchy or stinging? Scrape it off, rinse, and tell a crew member"],
     links:[{ t:"Inspo 1", u:"https://pin.it/7pJWRxiIN" }, { t:"Inspo 2", u:"https://pin.it/3NJ4FZbUU" }, { t:"Inspo 3", u:"https://pin.it/1hzneALIa" }] },
   { id:"bdz", em:"💎", name:"Bedazzling", where:"Loft, by the screen", c:"#c2185b",
-    how:["Bring something: phone case, cap, water bottle…", "Tiny dots of glue, then press the gem on", "Let it dry before you touch it"], links:[] },
+    how:["Bring something: phone case, cap, water bottle…", "Tiny dots of glue, then press the gem on", "Let it dry before you touch it", "Nothing to bedazzle? We have some shades for you, while stocks last 😎"], links:[] },
   { id:"granny", em:"👵", name:"Mexican Granny", where:"Haven", c:"#00a99d",
-    how:["Granny is blindfolded with a hat and a pool noodle. Steal the hat without getting hit",
+    how:["Granny is blindfolded, wears a sombrero and holds a pool noodle", "Steal the sombrero without getting hit!",
          "No pushing, no trapping Granny with chairs", "10 min games, 10 people per slot. Book below 👇"], links:[] },
   { id:"game", em:"🎮", name:"Gaming room", where:"Haus 1", c:"#1e88e5",
-    how:["PS5 (4 controllers): EA Sports FC 26, NBA 2K26, It Takes Two", "Switch (4 controllers): games TBC", "30 min slots. Book below 👇"], links:[] },
+    how:["PS5 (4 controllers):\n- EA Sports FC 26\n- NBA 2K26\n- It Takes Two", "Switch (4 controllers):\n- games TBC", "30 min slots. Book below 👇"], links:[] },
   { id:"ktv", em:"🎤", name:"KTV room", where:"Haus 2", c:"#d63aa1",
     how:["Just walk in, no booking", "Search your song on YouTube + \"karaoke\"", "Pass the mic, everyone sings"], links:[] },
   { id:"pb", em:"📸", name:"Photobooth", where:"Meeting Room 1", c:"#ff3d7f",
-    how:["Grab props + your friends", "Camera + photo printer: ask crew to print your pic"], links:[] },
+    how:["Grab your friends + the props", "Take your pics and print them yourself at the photo printer 📸"], links:[] },
 ];
 const BOOKING_API = "https://script.google.com/macros/s/AKfycbwBbWddES-1CVIeQDLR1ef2Wz9coWz75k7Hw8tBkvo17SsHq42tgN8qlX7rwxEVuIg/exec"; // paste your Google Apps Script Web app URL here (ends in /exec). Leave "" to hide booking.
 const BOOKABLE = { granny:"Granny", game:"Gaming" }; // station id : room name in the Slots tab
