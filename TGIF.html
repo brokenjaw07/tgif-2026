@@ -69,6 +69,8 @@
   .card .em{font-size:30px;line-height:1}
   .card b{font-size:15px;line-height:1.2}
   .card small{font-size:12px;color:var(--soft);font-weight:700}
+  .card.bk{border-color:var(--c);box-shadow:3px 3px 0 var(--c);border-width:3px}
+  .card .tag{align-self:flex-start;background:var(--c);color:#fff;font-size:11px;font-weight:900;padding:3px 8px;border-radius:99px;margin-top:2px}
 
   footer{text-align:center;color:var(--soft);font-weight:800;font-size:13px;margin:28px 0 0}
 
@@ -272,6 +274,7 @@ requestAnimationFrame(() => { const m = $("mapscroll"); m.scrollLeft = (m.scroll
 STATIONS.forEach(s => { const c = document.createElement("button"); c.className = "card"; c.style.setProperty("--c", s.c);
   c.innerHTML = `<span class="em"></span><b></b><small></small>`;
   c.querySelector(".em").textContent = s.em; c.querySelector("b").textContent = s.name; c.querySelector("small").textContent = "📍 " + s.where;
+  if (BOOKING_API && BOOKABLE[s.id]){ c.classList.add("bk"); const t = document.createElement("span"); t.className = "tag"; t.textContent = "📅 Booking needed"; c.appendChild(t); }
   c.addEventListener("click", () => openSheet(s)); $("grid").appendChild(c); });
 
 // detail sheet
