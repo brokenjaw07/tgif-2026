@@ -149,7 +149,7 @@
   .gbox .final{font-family:var(--display);font-size:56px;line-height:1;color:var(--pink)}
   .lb{list-style:none;margin:10px 0;padding:0;text-align:left}
   .lb li{display:flex;gap:8px;padding:6px 8px;border-radius:10px;font-weight:800}
-  .lb li:nth-child(-n+5){background:#fff3d6}
+  .lb li:nth-child(-n+3){background:#fff3d6}
   .lb li.me{outline:2.5px solid var(--pink)}
   .lb li i{font-style:normal;width:26px;text-align:center}
   .lb li span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -179,7 +179,7 @@
     </div>
     <div class="feat">
       <button class="fbtn" id="fSpud" style="background:#c46a1b"><span class="em">🥔</span><b>Spud queue</b><small>Get a number at the spud table</small></button>
-      <button class="fbtn" id="fGame" style="background:#e63946"><span class="em">🌮</span><b>Catch the Tacos</b><small>Top 5 win a free mocktail</small></button>
+      <button class="fbtn" id="fGame" style="background:#e63946"><span class="em">🌮</span><b>Catch the Tacos</b><small>Top 3 win a free mocktail. Ends 8PM</small></button>
     </div>
 
     <h2>🗺️ Floor Plan <small>tap a pin</small></h2>
@@ -246,7 +246,7 @@ const STATIONS = [
 ];
 const BOOKING_API = "https://script.google.com/macros/s/AKfycbwBbWddES-1CVIeQDLR1ef2Wz9coWz75k7Hw8tBkvo17SsHq42tgN8qlX7rwxEVuIg/exec"; // paste your Google Apps Script Web app URL here (ends in /exec). Leave "" to hide booking.
 const BOOKABLE = { granny:"Granny" }; // station id : room name in the Slots tab
-const PRIZE = "Top 5 on the leaderboard win a free mocktail 🍹 (TGIF Crew announces when it closes)";
+const PRIZE = "Top 3 on the leaderboard win a free mocktail 🍹 Leaderboard closes at 8PM";
 const FLOORPLAN_URL = "https://brokenjaw07.github.io/tgif-2026/TGIF_Hub_FloorPlan.html";
 const PINS = {"reg": [[50.7, 54.4]], "bags": [[33.6, 12.9]], "food": [[64.9, 11.8]], "spud": [[55.2, 14.8]], "drinks": [[46.8, 15.1]], "chill": [[84.5, 52.3]], "brace": [[75.2, 15.6]], "jagua": [[80.3, 15.6]], "bdz": [[85.8, 34.5]], "granny": [[18.7, 31.8]], "game": [[41, 45.0]], "ktv": [[30.2, 45.0]], "pb": [[39.6, 12.9]]}; // where each station's pin sits on the map picture, [% from left, % from top]
 const SHORT = { reg:"Register", bags:"Bags", food:"Food", spud:"Spuds", drinks:"Mocktails", chill:"Board games", pb:"Photobooth", brace:"Bracelets", jagua:"Henna", bdz:"Bedazzle", granny:"Granny", game:"Gaming", ktv:"KTV" };
@@ -483,7 +483,7 @@ function gEnd(){
   $("gBox").querySelector(".prize").textContent = PRIZE; $("gAgain").onclick = gStart; $("gDone").onclick = gCloseGame;
   if (!(BOOKING_API && tg && tg.initData)){ $("gSave").textContent = "Open this in the TGIF bot to save your score."; return; }
   api("game_score", { score:sc }).then(d => { $("gSave").textContent = d.isBest ? "🔥 New personal best! You're #" + d.me.rank : "Your best: " + d.me.best + " (#" + d.me.rank + ")"; gFillBoard(d); })
-    .catch(e => { $("gSave").textContent = "Couldn't save: " + e.message; });
+    .catch(e => { $("gSave").textContent = /closed/.test(e.message) ? e.message : "Couldn't save: " + e.message; });
 }
 function gShowBoard(){
   gBox(`<h3>🏆 Leaderboard</h3><p id="gSave">Loading…</p><ol class="lb" id="gLb"></ol><p class="prize"></p><div class="gbtns"><button class="p" id="gPlay">Play</button><button class="s" id="gDone">Close</button></div>`);
