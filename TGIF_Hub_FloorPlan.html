@@ -699,14 +699,14 @@ const ROOMS = [
    has:["Grey sofa, Persian rug, coffee table","2 red chairs, wooden lounge chair","TV on the wall","Stack of wooden benches"],
    setup:["Lyrics off YouTube on the wall TV, laptop on the coffee table","Speaker + mic next to the TV, sofa faces the singers","2 NanGuang lights in the corners, main lights off","No booking: just walk in"],
    watch:["Bring the portable speaker + 2 mics","Request the laptop from a ministry early","Check how much sound leaks into Haus 1 next door"] },
- { id:"mr1", name:"Mtg Rm 2", act:"Bag room", color:"#5d4037", floor:"tile", tint:"#bfb9b0", rects:[[14.2,0,3.0,3.6]], lbl:[15.7,2.2],
+ { id:"mr1", name:"Mtg Rm 2", act:"Photobooth 2", color:"#c2185b", floor:"tile", tint:"#bfb9b0", rects:[[14.2,0,3.0,3.6]], lbl:[15.7,2.2],
    has:["Meeting table + chairs","Stacked chairs, 2 TV trolleys (1 goes to Haus 2)"],
-   setup:["Racks (from Events) on the back + side wall, boxes on the other wall. A–F, G–L, M–R, S–Z, first letter of your name","Tape a walkway on the floor from the door, nothing goes on it","At registration: masking tape + marker, write your name on your bag","Sign on the door: BAGS 🎒. Phone + wallet stay with you"],
-   watch:["Confirmed as the bag room. Racks still TBC with Events","Room is small (rough guess ~3 x 3.6m). 4 racks hold ~55 bags + the floor below them","Nobody guards it. Crew at reception keeps an eye on the corridor","Move the stacked chairs out (Haven) before bags come in"] },
+   setup:["Second photobooth, same vibes as Mtg Rm 1: backdrop on the far wall, ring light, props table","People take their pics and print them themselves"],
+   watch:["No bag room any more: both meeting rooms are photobooths","Move the stacked chairs + spare TV trolley out (Haven) before setup","~6 people max inside at once"] },
  { id:"mr2", name:"Mtg Rm 1", act:"Photobooth", color:"#c2185b", floor:"tile", tint:"#bfb9b0", rects:[[17.2,0,3.0,3.6]], lbl:[18.7,2.2],
    has:["Meeting table + chairs"],
    setup:["TGIF'26 newspaper backdrop on the far wall","Props table: entry-proof cards, sombreros, funny sunglasses","Camera + photo printer from TOK"],
-   watch:["~6 people max inside at once","Confirm with TOK who sets up the printer and who runs it","Only 1 photobooth now (the streamer one is dropped)"] },
+   watch:["~6 people max inside at once","Confirm with TOK who sets up the printer","Mtg Rm 2 next door is a photobooth too (same vibes)"] },
  { id:"store", name:"Store", act:"Logistics", color:"#c82828", floor:"tile", tint:"#bdb6ab", rects:[[13,0,1.2,3.6]], lbl:[13.6,1.8],
    has:["Storage"], setup:["Spare cups, ice, piñata candy, cake, candles, prizes"], watch:["Crew only. Keep the door shut"] },
  { id:"haven", name:"Haven", act:"Mexican Granny", color:"#2e7d32", floor:"planks", tint:"#4a4744", rects:[[6,0,7,12.4]], lbl:[9.5,6.2],
@@ -1030,6 +1030,16 @@ const V25 = { set:{ // photobooth -> Meeting Rm 1 (first room people see), bags 
   rackA:{ x:14.95, z:0.3, r:0 }, rackB:{ x:16.45, z:0.3, r:0 }, rackC:{ x:14.5, z:1.35, r:Math.PI/2 }, rackD:{ x:14.5, z:2.65, r:Math.PI/2 },
   mrTape:{ x:15.8, z:2.15 }, box1:{ x:16.9, z:1.2 }, box2:{ x:16.9, z:1.75 }, "adm-pb":{ x:18.6, z:4.0 }, "adm-bags":{ x:16.5, z:4.0 } } };
 function applyV25(st){ if (!st || !st.all) return; st.all.forEach(i => { const c = V25.set[i.id]; if (c) Object.assign(i, c); }); }
+const V26 = { // no bag room: Meeting Rm 2 becomes a second photobooth
+  del:["rackA","rackB","rackC","rackD","mrTape","box1","box2","adm-bags"],
+  set:{ "adm-wing":{ label:"Sign: → Photobooths, Gaming, KTV, Haven" }, "adm-pb":{ x:17.2, z:4.0, label:"Sign: Photobooths 📸" } },
+  all:[ { id:"pbBd2", t:"backdrop", x:15.7, z:0.12, r:0, label:"Photobooth 2 backdrop" }, { id:"pbRl2", t:"ringLight", x:15.7, z:2.5, r:Math.PI },
+        { id:"pbTb2", t:"props", x:14.85, z:2.95, r:0, label:"Props" } ] };
+function applyV26(st){ if (!st || !st.all) return;
+  for (let i = st.all.length-1; i >= 0; i--) if (V26.del.includes(st.all[i].id)) st.all.splice(i,1);
+  st.all.forEach(i => { const c = V26.set[i.id]; if (c) Object.assign(i, c); });
+  V26.all.forEach(it => { if (!st.all.find(x => x.id === it.id)) st.all.push(clone(it)); });
+  Object.values(st.s || {}).forEach(L => { for (let i = L.length-1; i >= 0; i--) if (V26.del.includes(L[i].id)) L.splice(i,1); }); }
 function applyV17(st){ if (!st || !st.all || !st.s) return;
   st.all.forEach(i => { const c = V17.set[i.id]; if (c) Object.assign(i, c); });
   for (let i = st.all.length-1; i >= 0; i--) if (V17.del.includes(st.all[i].id)) st.all.splice(i,1);
@@ -1047,7 +1057,8 @@ function migrate(st){ if (!st) return st; if (st.have && !st.have._food2 && st.s
   if (st.have && !st.have._v22 && st.s){ applyV22(st); st.have._v22 = 1; }
   if (st.have && !st.have._v23 && st.s){ applyV23(st); st.have._v23 = 1; }
   if (st.have && !st.have._v24 && st.s){ applyV24(st); st.have._v24 = 1; }
-  if (st.have && !st.have._v25 && st.s){ applyV25(st); st.have._v25 = 1; } const walk = l => (l || []).forEach(i => { if (i.label) i.label = i.label.replace("Jagua tattoo ($1.50 / $3)","Henna tattoo").replace(/Jagua/g,"Henna").replace(/jagua/g,"henna");
+  if (st.have && !st.have._v25 && st.s){ applyV25(st); st.have._v25 = 1; }
+  if (st.have && !st.have._v26 && st.s){ applyV26(st); st.have._v26 = 1; } const walk = l => (l || []).forEach(i => { if (i.label) i.label = i.label.replace("Jagua tattoo ($1.50 / $3)","Henna tattoo").replace(/Jagua/g,"Henna").replace(/jagua/g,"henna");
     if (i.id === "h2rug" && i.t === "rug") i.t = "persian";
     if (i.id === "cubeL" && Math.abs(i.x - 34.0) < 0.01 && Math.abs(i.z - 1.3) < 0.01){ i.x = 35.65; i.z = 11.25; i.r = Math.PI/2; } });
   walk(st.all); Object.values(st.s || {}).forEach(walk); return st; }
@@ -1235,7 +1246,7 @@ function mkLabel(html, cls){ const el = document.createElement("div"); el.classN
 // short name on the plan, tap it to see the full note
 const SHORT = { f1:"3. Churros + fondue", f2:"Spuds + wraps (crew)", f3:"2. Pasta + finger food", f4:"1. Nachos bar", brR1:"Bracelets", brR2:"Bracelets", hnR1:"Henna (drying)", bdz2:"Bedazzling", communal:"DIY mocktails", regA:"Registration", regB:"Registration", rec:"Reception",
   oval:"Bracelets", jag:"Henna", bdz:"Bedazzling", lim:"Limbo", don:"Pin the donkey", lblYard:"Main chill area", lblYard8:"Main chill area", lblYard9:"Main chill area",
-  rugL:"Rug", cubeL:"Board games", binP:"Bin", h1tv:"PS5", h2tv:"Lyrics TV", h2tv2:"Switch", h1spk:"Speaker", mr2bd:"Photobooth", mr2tb:"Props", bdzA:"Bedazzling", bdzB:"Round table (→ cake)", rugL:"Chill area", box1:"Bag boxes", mrTape:"Walkway tape", rackA:"Bags A–F", rackB:"Bags G–L", rackC:"Bags M–R", rackD:"Bags S–Z", ng1:"NanGuang", ng2:"NanGuang", "adm-pay":"Pay point",
+  rugL:"Rug", cubeL:"Board games", binP:"Bin", h1tv:"PS5", h2tv:"Lyrics TV", h2tv2:"Switch", h1spk:"Speaker", mr2bd:"Photobooth", mr2tb:"Props", pbBd2:"Photobooth 2", pbTb2:"Props", bdzA:"Bedazzling", bdzB:"Round table (→ cake)", rugL:"Chill area", box1:"Bag boxes", mrTape:"Walkway tape", rackA:"Bags A–F", rackB:"Bags G–L", rackC:"Bags M–R", rackD:"Bags S–Z", ng1:"NanGuang", ng2:"NanGuang", "adm-pay":"Pay point",
   hvG:"Mexican Granny", hvG1:"Granny 1", hvG2:"Granny 2", hvStack3:"Spare chairs", pin:"Cactus piñata", pin2:"Unicorn piñata", lblHv8:"Stand outside the circles", cake:"Giant cake", crowd:"Cake crowd", mic8:"Emcee", lbl9:"Open floor" };
 function shortOf(id, text){ if (SHORT[id]) return SHORT[id]; let s = text.replace(/^(Sign|QR): /,"$1 ").split(/[:(]/)[0].trim(); return s.length > 24 ? s.slice(0,22).trim() + "…" : s; }
 function mkTag(short, full, cls){ const el = mkLabel("", cls); el.textContent = short; el.dataset.short = short;
@@ -1356,8 +1367,8 @@ const SPOTS = [
   { id:"haven", n:"👵 Haven", p:[12.3,10.6], l:[8.0,4.5] },
   { id:"game", n:"🎮 Gaming", p:[18.6,6.9], l:[21.0,11.5] },
   { id:"ktv", n:"🎤 KTV", p:[16.9,6.9], l:[13.5,10.5] },
-  { id:"pb2", n:"📸 Photobooth", p:[18.7,3.3], l:[18.7,0] },
-  { id:"bags", n:"🎒 Bag room", p:[16.6,3.3], l:[14.4,0.6] },
+  { id:"pb2", n:"📸 Photobooth 1", p:[18.7,3.3], l:[18.7,0] },
+  { id:"bags", n:"📸 Photobooth 2", p:[15.7,3.3], l:[15.7,0] },
 ];
 let WALK = false, walkSpot = null;
 const walkEl = document.getElementById("walk"), spotsEl = document.getElementById("spots");
@@ -1493,7 +1504,7 @@ function selectRoom(id, doFly){ const r = ROOMS.find(x => x.id === id); [...list
 const rc = document.getElementById("resetConfirm"); let pending = null;
 function askReset(kind, text){ pending = kind; rc.hidden = false; rc.innerHTML = `${text} <button class="btn" id="rcYes" style="border:1px solid var(--red);color:var(--red);background:var(--bg)">Yes, reset</button> <button class="btn" id="rcNo" style="border:1px solid var(--line);background:var(--bg)">Cancel</button>`;
   document.getElementById("rcYes").onclick = () => { if (pending === "slot") state.s[SLOT].splice(0, state.s[SLOT].length, ...clone(SLOTS[SLOT])); else { state.all.splice(0, state.all.length, ...clone(STATIC)); Object.keys(state.s).forEach(k => state.s[k].splice(0, state.s[k].length, ...clone(SLOTS[k]))); }
-    applyV17(state); applyV18(state); applyV19(state); applyV20(state); applyV21(state); applyV22(state); applyV23(state); applyV24(state); applyV25(state);
+    applyV17(state); applyV18(state); applyV19(state); applyV20(state); applyV21(state); applyV22(state); applyV23(state); applyV24(state); applyV25(state); applyV26(state);
     save(); rebuildAll(); setSlot(SLOT); rc.hidden = true; };
   document.getElementById("rcNo").onclick = () => { rc.hidden = true; }; }
 document.getElementById("resetSlot").addEventListener("click", () => askReset("slot", sharedOn ? "Put this time slot back to the original layout for everyone?" : "Put this time slot back to the original layout?"));
